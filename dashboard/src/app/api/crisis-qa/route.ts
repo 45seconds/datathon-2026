@@ -276,7 +276,7 @@ export async function POST(request: Request) {
       // General question (no specific country)
       sources.push({ name: `HPC HNO ${year}`, url: 'https://data.humdata.org/' });
       
-      const forgotten = await getTopForgottenCrises(year, 10);
+      const forgotten = await dataSource.getTopForgottenCrises(year, 10);
       const allMetrics = await dataSource.getCountryCrisisMetrics(year);
       
       if (question.toLowerCase().includes('most') || question.toLowerCase().includes('top') || question.toLowerCase().includes('worst')) {

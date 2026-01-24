@@ -1,6 +1,4 @@
 import { NextResponse } from 'next/server';
-import { promises as fs } from 'fs';
-import path from 'path';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -10,8 +8,17 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Missing path parameter' }, { status: 400 });
   }
 
+  // In production, CSV files are not available on the filesystem
+  // All data is served from Supabase database via /api/metrics endpoints
+  return NextResponse.json({ 
+    error: 'Dataset viewer not available in production. All data is served from the database via API endpoints.',
+    message: 'Use the dashboard tabs to view crisis data, metrics, and analysis.'
+  }, { status: 503 });
+
+  /* Original filesystem code - disabled for production
   try {
     const fullPath = path.join(process.cwd(), '..', datasetPath);
+    const { promises as fs } = await import('fs');
     const content = await fs.readFile(fullPath, 'utf-8');
     
     // Parse CSV
@@ -47,24 +54,5 @@ export async function GET(request: Request) {
     console.error('Failed to load dataset:', error);
     return NextResponse.json({ error: 'Failed to load dataset' }, { status: 500 });
   }
-}
-
-function parseCSVLine(line: string): string[] {
-  const values: string[] = [];
-  let current = '';
-  let inQuotes = false;
-
-  for (let i = 0; i < line.length; i++) {
-    const char = line[i];
-    if (char === '"') {
-      inQuotes = !inQuotes;
-    } else if (char === ',' && !inQuotes) {
-      values.push(current.trim());
-      current = '';
-    } else {
-      current += char;
-    }
-  }
-  values.push(current.trim());
-  return values;
+  */
 }
