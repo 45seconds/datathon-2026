@@ -208,9 +208,29 @@ export async function getCountryCrisisMetrics(
       fundingGap,
       revisedRequirements: requirements,
       usdPerPersonInNeed: usdPerPerson,
+      mismatch: 0, // Will be calculated after all metrics are built
       year,
     });
   }
+
+  // Calculate mismatch scores (percentile-based)
+  const needRates = metrics.map((m) => m.needRate).sort((a, b) => a - b);
+  const usdRates = metrics
+    .filter((m) => m.usdPerPersonInNeed > 0)
+    .map((m) => m.usdPerPersonInNeed)
+    .sort((a, b) => a - b);
+
+  const getPercentile = (value: number, sorted: number[]): number => {
+    if (sorted.length === 0) return 0.5;
+    const idx = sorted.findIndex((v) => v >= value);
+    return idx === -1 ? 1 : idx / sorted.length;
+  };
+
+  metrics.forEach((m) => {
+    const needPct = getPercentile(m.needRate, needRates);
+    const usdPct = m.usdPerPersonInNeed > 0 ? getPercentile(m.usdPerPersonInNeed, usdRates) : 0.5;
+    m.mismatch = needPct - usdPct;
+  });
 
   // Sort by inNeed descending
   return metrics.sort((a, b) => b.inNeed - a.inNeed);

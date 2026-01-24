@@ -5,3 +5,5 @@ export { YearSelector } from './YearSelector';
 export { CrisisRow } from './CrisisRow';
 export { Navbar } from './Navbar';
 export { NotebookViewer } from './NotebookViewer';
+export { CrisisMap } from './CrisisMap';
+export { DatasetViewer } from './DatasetViewer';
