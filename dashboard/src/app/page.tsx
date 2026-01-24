@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Navbar, DataTable, NotebookViewer, CrisisMap, DatasetViewer, CrisisDetailPanel, SidebarQA } from '@/components';
+import { Navbar, DataTable, NotebookViewer, CrisisMap, DatasetViewer, CrisisDetailPanel, SidebarQA, AIChatSidebar } from '@/components';
 import { CountryCrisisMetrics, DashboardSummary } from '@/types';
 import { getCountryFlag } from '@/lib/flags';
 import type { Ipynb } from 'react-ipynb-renderer';
@@ -34,6 +34,7 @@ export default function Home() {
   const [mapYear, setMapYear] = useState(2026);
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [showQA, setShowQA] = useState(false);
+  const [showAIChat, setShowAIChat] = useState(false);
 
   // Listen for country selection from map popup button
   useEffect(() => {
@@ -102,7 +103,12 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-white">
-      <Navbar activeTab={activeTab} onTabChange={setActiveTab} />
+      <Navbar 
+        activeTab={activeTab} 
+        onTabChange={setActiveTab}
+        onToggleChat={() => setShowAIChat(!showAIChat)}
+        chatOpen={showAIChat}
+      />
 
       {/* Q&A Toggle Button - minimal style */}
       <button
@@ -116,6 +122,12 @@ export default function Home() {
       </button>
 
       <SidebarQA isOpen={showQA} onClose={() => setShowQA(false)} />
+      
+      {/* AI Chat Sidebar */}
+      <AIChatSidebar isOpen={showAIChat} onClose={() => setShowAIChat(false)} />
+
+      {/* Main content wrapper - adjusts when AI chat is open */}
+      <div className={`transition-all duration-300 ${showAIChat ? 'mr-[400px]' : ''}`}>
 
       {/* Overview Tab */}
       {activeTab === 'overview' && summary && (
@@ -273,6 +285,8 @@ export default function Home() {
           loading={notebookLoading}
         />
       )}
+
+      </div>{/* End of main content wrapper */}
     </div>
   );
 }
