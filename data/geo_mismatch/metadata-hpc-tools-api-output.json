@@ -1,0 +1,15 @@
+{
+    "created": "2018-12-04T15:27:27.496172",
+    "description": "Original JSON API output (live).",
+    "format": "JSON",
+    "download_url": "http://api.hpc.tools/v2/public/plan",
+    "id": "5d238ba7-df31-461f-bf1e-9d1a045d77b1",
+    "last_modified": "2026-01-24T08:44:03.942512",
+    "metadata_modified": "2026-01-24T10:44:56.547139",
+    "microdata": false,
+    "dataset_id": "f0e95437-b6d9-4897-9e3f-84853bcbfaee",
+    "resource_type": "api",
+    "name": "HPC Tools API output",
+    "mimetype": null,
+    "size": "3.8M"
+}
