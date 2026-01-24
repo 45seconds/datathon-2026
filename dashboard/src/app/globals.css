@@ -1,5 +1,8 @@
 @import 'tailwindcss';
 
+/* Import notebook theme */
+@import 'react-ipynb-renderer/dist/styles/default.css';
+
 :root {
   --background: #fafafa;
   --foreground: #0a0a0a;
@@ -52,5 +55,195 @@ html {
 
   ::-webkit-scrollbar-thumb:hover {
     background: #3f3f46;
+  }
+}
+
+/* Notebook container styling */
+.notebook-container {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.notebook-container .ipynb-renderer {
+  font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Cell styling overrides */
+.notebook-container .ipynb-renderer .cell {
+  border: 1px solid #e4e4e7;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+
+.notebook-container .ipynb-renderer .cell-content {
+  padding: 0;
+}
+
+/* Code cells */
+.notebook-container .ipynb-renderer .input-cell {
+  background: #18181b;
+  border-radius: 6px;
+  margin: 8px;
+}
+
+.notebook-container .ipynb-renderer .input-cell pre {
+  margin: 0;
+  padding: 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+}
+
+/* Output cells */
+.notebook-container .ipynb-renderer .output-cell {
+  background: #fafafa;
+  padding: 12px;
+  border-top: 1px solid #e4e4e7;
+}
+
+.notebook-container .ipynb-renderer .output-cell pre {
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Markdown cells */
+.notebook-container .ipynb-renderer .markdown-cell {
+  padding: 16px;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.notebook-container .ipynb-renderer .markdown-cell h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0 0 16px 0;
+  color: #18181b;
+}
+
+.notebook-container .ipynb-renderer .markdown-cell h2 {
+  font-size: 1.375rem;
+  font-weight: 600;
+  margin: 24px 0 12px 0;
+  color: #18181b;
+}
+
+.notebook-container .ipynb-renderer .markdown-cell h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 20px 0 8px 0;
+  color: #27272a;
+}
+
+.notebook-container .ipynb-renderer .markdown-cell p {
+  margin: 0 0 12px 0;
+  color: #3f3f46;
+}
+
+.notebook-container .ipynb-renderer .markdown-cell ul,
+.notebook-container .ipynb-renderer .markdown-cell ol {
+  margin: 0 0 12px 0;
+  padding-left: 24px;
+  color: #3f3f46;
+}
+
+.notebook-container .ipynb-renderer .markdown-cell li {
+  margin-bottom: 4px;
+}
+
+.notebook-container .ipynb-renderer .markdown-cell code {
+  background: #f4f4f5;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+}
+
+.notebook-container .ipynb-renderer .markdown-cell strong {
+  font-weight: 600;
+  color: #18181b;
+}
+
+/* Image outputs */
+.notebook-container .ipynb-renderer .output-cell img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+/* DataFrame/table outputs */
+.notebook-container .ipynb-renderer .output-cell table {
+  border-collapse: collapse;
+  font-size: 12px;
+  width: auto;
+  margin: 8px 0;
+}
+
+.notebook-container .ipynb-renderer .output-cell th,
+.notebook-container .ipynb-renderer .output-cell td {
+  border: 1px solid #e4e4e7;
+  padding: 6px 10px;
+  text-align: left;
+}
+
+.notebook-container .ipynb-renderer .output-cell th {
+  background: #f4f4f5;
+  font-weight: 600;
+}
+
+.notebook-container .ipynb-renderer .output-cell tr:nth-child(even) td {
+  background: #fafafa;
+}
+
+/* Dark mode overrides */
+@media (prefers-color-scheme: dark) {
+  .notebook-container .ipynb-renderer .cell {
+    border-color: #27272a;
+  }
+
+  .notebook-container .ipynb-renderer .input-cell {
+    background: #09090b;
+  }
+
+  .notebook-container .ipynb-renderer .output-cell {
+    background: #18181b;
+    border-top-color: #27272a;
+  }
+
+  .notebook-container .ipynb-renderer .markdown-cell {
+    background: #18181b;
+  }
+
+  .notebook-container .ipynb-renderer .markdown-cell h1,
+  .notebook-container .ipynb-renderer .markdown-cell h2,
+  .notebook-container .ipynb-renderer .markdown-cell h3,
+  .notebook-container .ipynb-renderer .markdown-cell strong {
+    color: #fafafa;
+  }
+
+  .notebook-container .ipynb-renderer .markdown-cell p,
+  .notebook-container .ipynb-renderer .markdown-cell ul,
+  .notebook-container .ipynb-renderer .markdown-cell ol {
+    color: #a1a1aa;
+  }
+
+  .notebook-container .ipynb-renderer .markdown-cell code {
+    background: #27272a;
+  }
+
+  .notebook-container .ipynb-renderer .output-cell th,
+  .notebook-container .ipynb-renderer .output-cell td {
+    border-color: #27272a;
+  }
+
+  .notebook-container .ipynb-renderer .output-cell th {
+    background: #27272a;
+  }
+
+  .notebook-container .ipynb-renderer .output-cell tr:nth-child(even) td {
+    background: #18181b;
   }
 }
