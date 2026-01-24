@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Navbar, StatCard, DataTable, CrisisRow, NotebookViewer } from '@/components';
 import { CountryCrisisMetrics, DashboardSummary } from '@/types';
+import type { Ipynb } from 'react-ipynb-renderer';
 
 function formatNumber(num: number): string {
   if (num >= 1_000_000_000) {
@@ -27,17 +28,13 @@ function formatCurrency(num: number): string {
   return `$${formatNumber(num)}`;
 }
 
-interface NotebookCell {
-  type: 'markdown' | 'code' | 'output';
-  content: string;
-}
-
 export default function Home() {
   const [activeTab, setActiveTab] = useState('overview');
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [countries, setCountries] = useState<CountryCrisisMetrics[]>([]);
   const [forgotten, setForgotten] = useState<CountryCrisisMetrics[]>([]);
-  const [notebookCells, setNotebookCells] = useState<NotebookCell[]>([]);
+  const [notebook, setNotebook] = useState<Ipynb | null>(null);
+  const [notebookLoading, setNotebookLoading] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -63,18 +60,39 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (activeTab === 'geo-mismatch') {
+    if (activeTab === 'geo-mismatch' && !notebook) {
+      setNotebookLoading(true);
       fetch('/api/notebook?path=notebooks/geo_mismatch.ipynb')
         .then((res) => res.json())
-        .then((data) => setNotebookCells(data.cells || []))
-        .catch(console.error);
+        .then((data) => {
+          setNotebook(data.notebook as Ipynb);
+        })
+        .catch(console.error)
+        .finally(() => setNotebookLoading(false));
     }
-  }, [activeTab]);
+  }, [activeTab, notebook]);
 
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-zinc-950">
-        <div className="text-sm text-zinc-500">Loading...</div>
+        <div className="flex items-center gap-3 text-sm text-zinc-500">
+          <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24" fill="none">
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            />
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            />
+          </svg>
+          Loading...
+        </div>
       </div>
     );
   }
@@ -146,12 +164,20 @@ export default function Home() {
         )}
 
         {activeTab === 'geo-mismatch' && (
-          <NotebookViewer
-            title="Geo-Mismatch Analysis"
-            description="Comparing humanitarian need (HPC HNO) to resources (HRP requirements) to identify forgotten crises"
-            notebookPath="notebooks/geo_mismatch.ipynb"
-            cells={notebookCells}
-          />
+          <div className="space-y-4">
+            <div className="flex items-center justify-between border-b border-zinc-200 pb-4 dark:border-zinc-800">
+              <div>
+                <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+                  Geo-Mismatch Analysis
+                </h2>
+                <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+                  Comparing humanitarian need (HPC HNO) to resources (HRP requirements) to identify forgotten crises
+                </p>
+              </div>
+            </div>
+            
+            <NotebookViewer notebook={notebook} loading={notebookLoading} />
+          </div>
         )}
       </main>
     </div>
