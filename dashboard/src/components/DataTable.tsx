@@ -8,15 +8,9 @@ interface DataTableProps {
 }
 
 function formatNumber(num: number): string {
-  if (num >= 1_000_000_000) {
-    return `${(num / 1_000_000_000).toFixed(1)}B`;
-  }
-  if (num >= 1_000_000) {
-    return `${(num / 1_000_000).toFixed(1)}M`;
-  }
-  if (num >= 1_000) {
-    return `${(num / 1_000).toFixed(1)}K`;
-  }
+  if (num >= 1_000_000_000) return `${(num / 1_000_000_000).toFixed(1)}B`;
+  if (num >= 1_000_000) return `${(num / 1_000_000).toFixed(1)}M`;
+  if (num >= 1_000) return `${(num / 1_000).toFixed(1)}K`;
   return num.toFixed(0);
 }
 
@@ -25,96 +19,83 @@ function formatPercent(num: number): string {
 }
 
 function formatCurrency(num: number): string {
-  if (num >= 1_000_000_000) {
-    return `$${(num / 1_000_000_000).toFixed(2)}B`;
-  }
-  if (num >= 1_000_000) {
-    return `$${(num / 1_000_000).toFixed(1)}M`;
-  }
+  if (num >= 1_000_000_000) return `$${(num / 1_000_000_000).toFixed(2)}B`;
+  if (num >= 1_000_000) return `$${(num / 1_000_000).toFixed(1)}M`;
   return `$${formatNumber(num)}`;
 }
 
 export function DataTable({ data, title, description }: DataTableProps) {
   return (
-    <div className="rounded-lg border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
-      <div className="border-b border-zinc-200 px-4 py-3 dark:border-zinc-800">
-        <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
-          {title}
-        </h3>
-        {description && (
-          <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
-            {description}
-          </p>
-        )}
+    <div>
+      <div className="mb-6">
+        <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">{title}</h2>
+        {description && <p className="mt-1 text-sm text-zinc-500">{description}</p>}
       </div>
       <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+        <table className="w-full">
           <thead>
-            <tr className="border-b border-zinc-100 text-left text-xs font-medium text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
-              <th className="px-4 py-2.5">Country</th>
-              <th className="px-4 py-2.5 text-right">Population</th>
-              <th className="px-4 py-2.5 text-right">In Need</th>
-              <th className="px-4 py-2.5 text-right">Need Rate</th>
-              <th className="px-4 py-2.5 text-right">Coverage</th>
-              <th className="px-4 py-2.5 text-right">Requirements</th>
-              <th className="px-4 py-2.5 text-right">$/Person</th>
+            <tr className="border-b border-zinc-200 text-left text-sm text-zinc-500 dark:border-zinc-800">
+              <th className="pb-4 pr-6 font-medium">Country</th>
+              <th className="pb-4 px-6 text-right font-medium">Population</th>
+              <th className="pb-4 px-6 text-right font-medium">In Need</th>
+              <th className="pb-4 px-6 text-right font-medium">Need Rate</th>
+              <th className="pb-4 px-6 text-right font-medium">Coverage</th>
+              <th className="pb-4 px-6 text-right font-medium">Requirements</th>
+              <th className="pb-4 pl-6 text-right font-medium">$/Person</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
-            {data.map((row) => (
+          <tbody>
+            {data.map((row, i) => (
               <tr
                 key={row.iso3}
-                className="transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
+                className={i < data.length - 1 ? 'border-b border-zinc-100 dark:border-zinc-800/50' : ''}
               >
-                <td className="px-4 py-2.5">
-                  <div className="flex items-center gap-2">
-                    <span className="text-base">{getCountryFlag(row.iso3)}</span>
-                    <span className="font-medium text-zinc-900 dark:text-zinc-100">
-                      {row.country}
-                    </span>
+                <td className="py-4 pr-6">
+                  <div className="flex items-center gap-3">
+                    <span className="text-xl">{getCountryFlag(row.iso3)}</span>
+                    <div>
+                      <span className="font-medium text-zinc-900 dark:text-white">{row.country}</span>
+                      <span className="ml-2 text-xs text-zinc-400">{row.iso3}</span>
+                    </div>
                   </div>
                 </td>
-                <td className="px-4 py-2.5 text-right tabular-nums text-zinc-600 dark:text-zinc-400">
+                <td className="py-4 px-6 text-right tabular-nums text-zinc-600 dark:text-zinc-400">
                   {formatNumber(row.population)}
                 </td>
-                <td className="px-4 py-2.5 text-right tabular-nums font-medium text-zinc-900 dark:text-zinc-100">
+                <td className="py-4 px-6 text-right tabular-nums font-medium text-zinc-900 dark:text-white">
                   {formatNumber(row.inNeed)}
                 </td>
-                <td className="px-4 py-2.5 text-right">
+                <td className="py-4 px-6 text-right">
                   <span
-                    className={`inline-flex rounded px-1.5 py-0.5 text-xs font-medium tabular-nums ${
+                    className={`tabular-nums font-medium ${
                       row.needRate > 0.5
-                        ? 'bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-400'
+                        ? 'text-red-600'
                         : row.needRate > 0.3
-                          ? 'bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-400'
-                          : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400'
+                          ? 'text-amber-600'
+                          : 'text-emerald-600'
                     }`}
                   >
                     {formatPercent(row.needRate)}
                   </span>
                 </td>
-                <td className="px-4 py-2.5 text-right">
-                  <div className="flex items-center justify-end gap-2">
-                    <div className="h-1 w-12 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700">
+                <td className="py-4 px-6 text-right">
+                  <div className="flex items-center justify-end gap-3">
+                    <div className="h-1.5 w-16 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700">
                       <div
-                        className="h-full rounded-full bg-blue-500"
+                        className="h-full rounded-full bg-emerald-500"
                         style={{ width: `${Math.min(row.coverageRate * 100, 100)}%` }}
                       />
                     </div>
-                    <span className="w-10 text-right tabular-nums text-zinc-600 dark:text-zinc-400">
+                    <span className="w-14 text-right tabular-nums text-zinc-600 dark:text-zinc-400">
                       {formatPercent(row.coverageRate)}
                     </span>
                   </div>
                 </td>
-                <td className="px-4 py-2.5 text-right tabular-nums text-zinc-600 dark:text-zinc-400">
-                  {row.revisedRequirements > 0
-                    ? formatCurrency(row.revisedRequirements)
-                    : '—'}
+                <td className="py-4 px-6 text-right tabular-nums text-zinc-600 dark:text-zinc-400">
+                  {row.revisedRequirements > 0 ? formatCurrency(row.revisedRequirements) : '—'}
                 </td>
-                <td className="px-4 py-2.5 text-right tabular-nums text-zinc-600 dark:text-zinc-400">
-                  {row.usdPerPersonInNeed > 0
-                    ? `$${row.usdPerPersonInNeed.toFixed(0)}`
-                    : '—'}
+                <td className="py-4 pl-6 text-right tabular-nums text-zinc-600 dark:text-zinc-400">
+                  {row.usdPerPersonInNeed > 0 ? `$${row.usdPerPersonInNeed.toFixed(0)}` : '—'}
                 </td>
               </tr>
             ))}

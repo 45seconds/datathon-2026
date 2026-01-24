@@ -49,6 +49,7 @@ export interface CountryCrisisMetrics {
   fundingGap: number; // inNeed - targeted
   revisedRequirements: number;
   usdPerPersonInNeed: number;
+  mismatch: number; // percentile(needRate) - percentile(usdPerPerson)
   year: number;
 }
 

@@ -7,12 +7,8 @@ interface CrisisRowProps {
 }
 
 function formatNumber(num: number): string {
-  if (num >= 1_000_000) {
-    return `${(num / 1_000_000).toFixed(1)}M`;
-  }
-  if (num >= 1_000) {
-    return `${(num / 1_000).toFixed(1)}K`;
-  }
+  if (num >= 1_000_000) return `${(num / 1_000_000).toFixed(1)}M`;
+  if (num >= 1_000) return `${(num / 1_000).toFixed(1)}K`;
   return num.toFixed(0);
 }
 
@@ -21,8 +17,8 @@ export function CrisisRow({ crisis, rank }: CrisisRowProps) {
   const coverageRate = (crisis.coverageRate * 100).toFixed(1);
 
   return (
-    <div className="flex items-center gap-4 rounded-lg border border-zinc-200 bg-white px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900">
-      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-red-100 text-xs font-semibold text-red-700 dark:bg-red-950 dark:text-red-400">
+    <div className="flex items-center gap-4 py-3 border-b border-zinc-100 last:border-0 dark:border-zinc-800/50">
+      <span className="flex h-6 w-6 items-center justify-center text-sm font-semibold text-red-600 dark:text-red-400">
         {rank}
       </span>
       
@@ -35,7 +31,7 @@ export function CrisisRow({ crisis, rank }: CrisisRowProps) {
           </span>
           <span className="text-xs text-zinc-400">{crisis.iso3}</span>
         </div>
-        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+        <p className="text-xs text-zinc-500">
           {formatNumber(crisis.inNeed)} in need
         </p>
       </div>
@@ -44,14 +40,14 @@ export function CrisisRow({ crisis, rank }: CrisisRowProps) {
         <p className="text-sm font-semibold tabular-nums text-red-600 dark:text-red-400">
           {needRate}%
         </p>
-        <p className="text-xs text-zinc-500">need rate</p>
+        <p className="text-xs text-zinc-400">need</p>
       </div>
 
       <div className="text-right">
         <p className="text-sm font-semibold tabular-nums text-amber-600 dark:text-amber-400">
           {coverageRate}%
         </p>
-        <p className="text-xs text-zinc-500">coverage</p>
+        <p className="text-xs text-zinc-400">coverage</p>
       </div>
 
       {crisis.usdPerPersonInNeed > 0 && (
@@ -59,7 +55,7 @@ export function CrisisRow({ crisis, rank }: CrisisRowProps) {
           <p className="text-sm font-semibold tabular-nums text-zinc-700 dark:text-zinc-300">
             ${crisis.usdPerPersonInNeed.toFixed(0)}
           </p>
-          <p className="text-xs text-zinc-500">per person</p>
+          <p className="text-xs text-zinc-400">/person</p>
         </div>
       )}
     </div>
