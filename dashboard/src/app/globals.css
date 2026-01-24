@@ -1,9 +1,24 @@
 @import 'tailwindcss';
 @import 'leaflet/dist/leaflet.css';
 
+/* ============================================
+   THEME: Cursor-inspired minimal palette
+   
+   Colors (3 main + 1 accent):
+   - Background: #ffffff (white)
+   - Text Primary: #171717 (near-black)
+   - Text Secondary: #737373 (neutral gray)
+   - Border: #e5e5e5 (light gray)
+   - Accent: #0066ff (blue - used sparingly)
+   ============================================ */
+
 :root {
   --background: #ffffff;
-  --foreground: #09090b;
+  --foreground: #171717;
+  --muted: #737373;
+  --border: #e5e5e5;
+  --accent: #0066ff;
+  --surface: #fafafa;
 }
 
 @theme inline {
@@ -12,26 +27,16 @@
   --font-sans: var(--font-inter);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #09090b;
-    --foreground: #fafafa;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
 }
 
-html {
-  scroll-behavior: smooth;
-}
-
-/* Scrollbar */
+/* Scrollbar - minimal */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -39,204 +44,165 @@ html {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d4d4d8;
-  border-radius: 4px;
+  background: var(--border);
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a1a1aa;
+  background: var(--muted);
 }
 
-@media (prefers-color-scheme: dark) {
-  ::-webkit-scrollbar-thumb {
-    background: #3f3f46;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: #52525b;
-  }
-}
+/* ============================================
+   LEAFLET MAP
+   ============================================ */
 
-/* Leaflet */
 .leaflet-container {
   font-family: inherit;
-  background: #f4f4f5;
+  background: var(--surface);
 }
 
 .leaflet-popup-content-wrapper {
-  border-radius: 12px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-  border: 1px solid #e4e4e7;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--border);
 }
 
 .leaflet-popup-content {
-  margin: 16px;
+  margin: 12px 16px;
   line-height: 1.5;
+  font-size: 13px;
 }
 
 .leaflet-popup-tip {
   background: white;
-  border: 1px solid #e4e4e7;
+  border: 1px solid var(--border);
   box-shadow: none;
 }
 
-/* Notebook wrapper - using the library's built-in styles */
-.ipynb-wrapper {
-  font-family: var(--font-sans), system-ui, sans-serif;
+/* ============================================
+   NOTEBOOK VIEWER
+   ============================================ */
+
+.notebook-viewer {
+  @apply bg-white min-h-screen;
 }
 
-/* Override notebook styles for better readability */
-.ipynb-wrapper .ipynb-renderer {
-  background: transparent !important;
+.notebook-content {
+  @apply max-w-4xl mx-auto px-6 py-8;
 }
 
-.ipynb-wrapper .cell {
-  margin-bottom: 24px !important;
-  border: none !important;
-  border-radius: 0 !important;
+/* Code cells */
+.notebook-content .cell {
+  @apply mb-4;
 }
 
-.ipynb-wrapper .cell-input {
-  background: #1e1e1e !important;
-  border-radius: 8px !important;
-  overflow: hidden;
+.notebook-content .cell-input {
+  @apply bg-neutral-50 border border-neutral-200 rounded-md overflow-hidden;
 }
 
-.ipynb-wrapper .cell-input pre {
-  padding: 16px !important;
-  margin: 0 !important;
-  font-size: 14px !important;
-  line-height: 1.6 !important;
-  font-family: 'SF Mono', 'Fira Code', Monaco, Consolas, monospace !important;
+.notebook-content .cell-input pre {
+  @apply p-3 m-0 text-xs leading-relaxed font-mono bg-neutral-50 text-neutral-800;
 }
 
-.ipynb-wrapper .cell-output {
-  margin-top: 12px !important;
-  padding: 16px !important;
-  background: #fafafa !important;
-  border: 1px solid #e4e4e7 !important;
-  border-radius: 8px !important;
+/* Output cells */
+.notebook-content .cell-output {
+  @apply py-2 mt-0;
 }
 
-@media (prefers-color-scheme: dark) {
-  .ipynb-wrapper .cell-output {
-    background: #18181b !important;
-    border-color: #27272a !important;
-  }
+.notebook-content .cell-output pre {
+  @apply text-xs leading-relaxed font-mono text-neutral-700 m-0 whitespace-pre-wrap break-words;
 }
 
-.ipynb-wrapper .cell-output pre {
-  font-size: 13px !important;
-  line-height: 1.5 !important;
-  white-space: pre-wrap !important;
-  word-break: break-word !important;
+/* Graphs and images - smaller */
+.notebook-content .cell-output img {
+  @apply max-w-[85%] h-auto block mx-auto my-4;
 }
 
-.ipynb-wrapper .cell-output img {
-  max-width: 100% !important;
-  height: auto !important;
-  display: block !important;
-  margin: 16px auto !important;
-  border-radius: 4px !important;
+/* Tables */
+.notebook-content table {
+  @apply border-collapse text-xs my-3 w-auto;
 }
 
-.ipynb-wrapper table {
-  border-collapse: collapse !important;
-  font-size: 13px !important;
-  margin: 12px 0 !important;
+.notebook-content th,
+.notebook-content td {
+  @apply border border-neutral-200 px-3 py-2 text-left;
 }
 
-.ipynb-wrapper th,
-.ipynb-wrapper td {
-  border: 1px solid #e4e4e7 !important;
-  padding: 8px 12px !important;
-  text-align: left !important;
+.notebook-content th {
+  @apply bg-neutral-50 font-medium text-neutral-700;
 }
 
-.ipynb-wrapper th {
-  background: #f4f4f5 !important;
-  font-weight: 600 !important;
+.notebook-content tr:nth-child(even) td {
+  @apply bg-neutral-50/50;
 }
 
-@media (prefers-color-scheme: dark) {
-  .ipynb-wrapper th,
-  .ipynb-wrapper td {
-    border-color: #3f3f46 !important;
-  }
-  .ipynb-wrapper th {
-    background: #27272a !important;
-  }
+/* Markdown */
+.notebook-content [class*="markdown"] {
+  @apply py-2 bg-transparent;
 }
 
-/* Markdown in notebooks */
-.ipynb-wrapper .markdown-cell {
-  padding: 0 !important;
-  background: transparent !important;
+.notebook-content [class*="markdown"] h1 {
+  @apply text-2xl font-semibold mt-8 mb-4 pb-2 border-b border-neutral-200 text-neutral-900;
 }
 
-.ipynb-wrapper .markdown-cell h1 {
-  font-size: 2rem !important;
-  font-weight: 700 !important;
-  margin: 32px 0 16px !important;
-  color: #18181b !important;
+.notebook-content [class*="markdown"] h2 {
+  @apply text-xl font-semibold mt-6 mb-3 text-neutral-900;
 }
 
-.ipynb-wrapper .markdown-cell h2 {
-  font-size: 1.5rem !important;
-  font-weight: 600 !important;
-  margin: 28px 0 12px !important;
-  color: #18181b !important;
+.notebook-content [class*="markdown"] h3 {
+  @apply text-lg font-medium mt-5 mb-2 text-neutral-800;
 }
 
-.ipynb-wrapper .markdown-cell h3 {
-  font-size: 1.25rem !important;
-  font-weight: 600 !important;
-  margin: 24px 0 8px !important;
-  color: #27272a !important;
+.notebook-content [class*="markdown"] p {
+  @apply mb-3 leading-relaxed text-neutral-600 text-sm;
 }
 
-.ipynb-wrapper .markdown-cell p {
-  margin: 0 0 16px !important;
-  line-height: 1.75 !important;
-  color: #3f3f46 !important;
+.notebook-content [class*="markdown"] ul,
+.notebook-content [class*="markdown"] ol {
+  @apply mb-3 pl-5;
 }
 
-.ipynb-wrapper .markdown-cell ul,
-.ipynb-wrapper .markdown-cell ol {
-  margin: 0 0 16px !important;
-  padding-left: 28px !important;
+.notebook-content [class*="markdown"] li {
+  @apply mb-1 leading-relaxed text-neutral-600 text-sm;
 }
 
-.ipynb-wrapper .markdown-cell li {
-  margin-bottom: 8px !important;
-  line-height: 1.7 !important;
-  color: #3f3f46 !important;
+.notebook-content [class*="markdown"] code {
+  @apply bg-neutral-100 px-1.5 py-0.5 rounded text-xs font-mono text-neutral-700;
 }
 
-.ipynb-wrapper .markdown-cell code {
-  background: #f4f4f5 !important;
-  padding: 2px 6px !important;
-  border-radius: 4px !important;
-  font-size: 0.9em !important;
-  font-family: 'SF Mono', Monaco, monospace !important;
+.notebook-content [class*="markdown"] strong {
+  @apply font-semibold text-neutral-800;
 }
 
-.ipynb-wrapper .markdown-cell strong {
-  font-weight: 600 !important;
-  color: #18181b !important;
+.notebook-content [class*="markdown"] hr {
+  @apply border-0 border-t border-neutral-200 my-6;
 }
 
-@media (prefers-color-scheme: dark) {
-  .ipynb-wrapper .markdown-cell h1,
-  .ipynb-wrapper .markdown-cell h2,
-  .ipynb-wrapper .markdown-cell h3,
-  .ipynb-wrapper .markdown-cell strong {
-    color: #fafafa !important;
-  }
-  .ipynb-wrapper .markdown-cell p,
-  .ipynb-wrapper .markdown-cell li {
-    color: #a1a1aa !important;
-  }
-  .ipynb-wrapper .markdown-cell code {
-    background: #27272a !important;
-  }
+.notebook-content [class*="markdown"] table {
+  @apply w-full my-4;
+}
+
+.notebook-content [class*="markdown"] th {
+  @apply bg-neutral-50 text-neutral-700;
+}
+
+/* Hide code mode */
+.hide-code-inputs .cell-input {
+  @apply hidden;
+}
+
+.hide-code-inputs .cell {
+  @apply mb-3;
+}
+
+.hide-code-inputs .cell-output {
+  @apply p-0;
+}
+
+.hide-code-inputs .cell-output img {
+  @apply my-6 rounded shadow-sm max-w-[80%];
+}
+
+.hide-code-inputs .cell-output pre {
+  @apply bg-neutral-50 p-3 rounded mb-3 border border-neutral-100;
 }

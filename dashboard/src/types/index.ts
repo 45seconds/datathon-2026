@@ -78,3 +78,80 @@ export interface ClusterMetrics {
   coverageRate: number;
   countryCount: number;
 }
+
+export interface CountryClusterGap {
+  cluster: string;
+  inNeed: number;
+  targeted: number;
+  coverageRate: number;
+  gap: number; // inNeed - targeted
+}
+
+export interface ForgottenCrisisWithSectors extends CountryCrisisMetrics {
+  topGaps: CountryClusterGap[];
+}
+
+// INFORM Severity data
+export interface INFORMSeverity {
+  iso3: string;
+  countryName: string;
+  crisisType: string;
+  severityIndex: number;
+  severityCategory: string;
+  trend: string;
+  primaryDriver: string;
+  drivers: string[];
+  region: string;
+  complexity: number;
+  operatingEnv: number;
+  year: number;
+  lastUpdated: string;
+}
+
+// Timeline data from HRP
+export interface CrisisTimeline {
+  iso3: string;
+  firstResponseDate: string;
+  yearsSinceFirstResponse: number;
+  plans: {
+    code: string;
+    startDate: string;
+    endDate: string;
+    requirements: number;
+  }[];
+}
+
+// Full crisis detail for sidebar/panel
+export interface CrisisDetail {
+  // Basic info
+  iso3: string;
+  country: string;
+  region: string;
+  
+  // Current metrics (latest year)
+  currentMetrics: CountryCrisisMetrics;
+  
+  // INFORM severity data
+  severity: INFORMSeverity | null;
+  
+  // Sector gaps
+  sectorGaps: CountryClusterGap[];
+  
+  // Timeline
+  timeline: CrisisTimeline | null;
+  
+  // Historical trends (2024-2026)
+  trends: {
+    year: number;
+    inNeed: number;
+    mismatch: number;
+    usdPerPerson: number;
+  }[];
+  
+  // Data sources for citations
+  sources: {
+    name: string;
+    description: string;
+    url?: string;
+  }[];
+}

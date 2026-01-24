@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Navbar, DataTable, NotebookViewer, CrisisMap, DatasetViewer } from '@/components';
+import { Navbar, DataTable, NotebookViewer, CrisisMap, DatasetViewer, CrisisDetailPanel, SidebarQA } from '@/components';
 import { CountryCrisisMetrics, DashboardSummary } from '@/types';
 import { getCountryFlag } from '@/lib/flags';
 import type { Ipynb } from 'react-ipynb-renderer';
@@ -32,6 +32,17 @@ export default function Home() {
   const [mapColorBy, setMapColorBy] = useState<'needRate' | 'coverageRate' | 'usdPerPersonInNeed' | 'mismatch'>('needRate');
   const [showCities, setShowCities] = useState(true);
   const [mapYear, setMapYear] = useState(2026);
+  const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
+  const [showQA, setShowQA] = useState(false);
+
+  // Listen for country selection from map popup button
+  useEffect(() => {
+    const handleSelectCountry = (e: CustomEvent<string>) => {
+      setSelectedCountry(e.detail);
+    };
+    window.addEventListener('selectCountry', handleSelectCountry as EventListener);
+    return () => window.removeEventListener('selectCountry', handleSelectCountry as EventListener);
+  }, []);
 
   useEffect(() => {
     async function fetchData() {
@@ -80,8 +91,8 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <span className="text-sm text-zinc-400">Loading...</span>
+      <div className="flex min-h-screen items-center justify-center bg-white">
+        <span className="text-sm text-neutral-400">Loading...</span>
       </div>
     );
   }
@@ -90,73 +101,84 @@ export default function Home() {
   const datasetPath = activeTab.startsWith('dataset:') ? activeTab.replace('dataset:', '') : null;
 
   return (
-    <div className="min-h-screen bg-white dark:bg-zinc-950">
+    <div className="min-h-screen bg-white">
       <Navbar activeTab={activeTab} onTabChange={setActiveTab} />
+
+      {/* Q&A Toggle Button - minimal style */}
+      <button
+        onClick={() => setShowQA(!showQA)}
+        className="fixed bottom-6 left-6 z-50 flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-4 py-2.5 text-sm text-neutral-700 shadow-sm transition-all hover:bg-neutral-50"
+      >
+        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        {showQA ? 'Close' : 'Ask'}
+      </button>
+
+      <SidebarQA isOpen={showQA} onClose={() => setShowQA(false)} />
 
       {/* Overview Tab */}
       {activeTab === 'overview' && summary && (
         <div>
-          {/* Hero Section */}
-          <section className="border-b border-zinc-100 dark:border-zinc-800">
-            <div className="mx-auto max-w-[1400px] px-6 py-16 lg:px-8">
-              <h1 className="text-4xl font-semibold tracking-tight text-zinc-900 dark:text-white lg:text-5xl">
+          {/* Hero Section - minimal */}
+          <section className="border-b border-neutral-100">
+            <div className="mx-auto max-w-6xl px-6 py-12">
+              <h1 className="text-3xl font-semibold tracking-tight text-neutral-900">
                 Humanitarian Crisis Dashboard
               </h1>
-              <p className="mt-4 max-w-2xl text-lg text-zinc-500 dark:text-zinc-400">
-                Analyzing humanitarian need vs resource allocation to identify underserved global crises. Data from OCHA HDX for 2024-2026.
+              <p className="mt-3 max-w-xl text-neutral-500">
+                Identifying underserved global crises through need vs resource allocation analysis.
               </p>
             </div>
           </section>
 
-          {/* Stats Section */}
-          <section className="border-b border-zinc-100 dark:border-zinc-800">
-            <div className="mx-auto grid max-w-[1400px] grid-cols-2 lg:grid-cols-4">
-              <div className="border-r border-zinc-100 px-6 py-10 dark:border-zinc-800 lg:px-8">
-                <p className="text-sm text-zinc-500">Countries in Crisis</p>
-                <p className="mt-2 text-5xl font-semibold tabular-nums tracking-tight text-zinc-900 dark:text-white">{summary.totalCountries}</p>
+          {/* Stats Section - clean grid */}
+          <section className="border-b border-neutral-100">
+            <div className="mx-auto grid max-w-6xl grid-cols-4 divide-x divide-neutral-100">
+              <div className="px-6 py-8">
+                <p className="text-sm text-neutral-500">Countries</p>
+                <p className="mt-1 text-4xl font-semibold tabular-nums text-neutral-900">{summary.totalCountries}</p>
               </div>
-              <div className="border-r border-zinc-100 px-6 py-10 dark:border-zinc-800 lg:border-r lg:px-8">
-                <p className="text-sm text-zinc-500">People in Need</p>
-                <p className="mt-2 text-5xl font-semibold tabular-nums tracking-tight text-red-600">{formatNumber(summary.totalInNeed)}</p>
-                <p className="mt-1 text-sm text-zinc-400">{(summary.avgCoverageRate * 100).toFixed(0)}% coverage</p>
+              <div className="px-6 py-8">
+                <p className="text-sm text-neutral-500">People in Need</p>
+                <p className="mt-1 text-4xl font-semibold tabular-nums text-neutral-900">{formatNumber(summary.totalInNeed)}</p>
+                <p className="mt-1 text-xs text-neutral-400">{(summary.avgCoverageRate * 100).toFixed(0)}% coverage</p>
               </div>
-              <div className="border-r border-zinc-100 px-6 py-10 dark:border-zinc-800 lg:px-8">
-                <p className="text-sm text-zinc-500">People Targeted</p>
-                <p className="mt-2 text-5xl font-semibold tabular-nums tracking-tight text-emerald-600">{formatNumber(summary.totalTargeted)}</p>
+              <div className="px-6 py-8">
+                <p className="text-sm text-neutral-500">Targeted</p>
+                <p className="mt-1 text-4xl font-semibold tabular-nums text-neutral-900">{formatNumber(summary.totalTargeted)}</p>
               </div>
-              <div className="px-6 py-10 lg:px-8">
-                <p className="text-sm text-zinc-500">Funding Requirements</p>
-                <p className="mt-2 text-5xl font-semibold tabular-nums tracking-tight text-blue-600">{formatCurrency(summary.totalRequirements)}</p>
-                <p className="mt-1 text-sm text-zinc-400">~${summary.avgUsdPerPerson.toFixed(0)} per person</p>
+              <div className="px-6 py-8">
+                <p className="text-sm text-neutral-500">Funding</p>
+                <p className="mt-1 text-4xl font-semibold tabular-nums text-neutral-900">{formatCurrency(summary.totalRequirements)}</p>
+                <p className="mt-1 text-xs text-neutral-400">${summary.avgUsdPerPerson.toFixed(0)}/person</p>
               </div>
             </div>
           </section>
 
-          {/* Underserved Section */}
-          <section className="border-b border-zinc-100 dark:border-zinc-800">
-            <div className="mx-auto max-w-[1400px] px-6 py-12 lg:px-8">
-              <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">Potentially Underserved Crises</h2>
-              <p className="mt-1 text-sm text-zinc-500">Countries with high need rates but relatively low resource allocation</p>
+          {/* Underserved Section - simplified */}
+          <section className="border-b border-neutral-100">
+            <div className="mx-auto max-w-6xl px-6 py-10">
+              <h2 className="text-lg font-medium text-neutral-900">Top Underserved Crises</h2>
+              <p className="mt-1 text-sm text-neutral-500">Highest need-to-resource mismatch</p>
               
-              <div className="mt-8 grid gap-6 lg:grid-cols-5">
+              <div className="mt-6 grid gap-4 sm:grid-cols-5">
                 {forgotten.slice(0, 5).map((crisis, index) => (
-                  <div key={crisis.iso3} className="group">
-                    <div className="flex items-center gap-3">
-                      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-red-50 text-sm font-semibold text-red-600 dark:bg-red-950 dark:text-red-400">
-                        {index + 1}
-                      </span>
-                      <span className="text-2xl">{getCountryFlag(crisis.iso3)}</span>
+                  <div key={crisis.iso3} className="rounded-lg border border-neutral-100 p-4">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-medium text-neutral-400">#{index + 1}</span>
+                      <span className="text-lg">{getCountryFlag(crisis.iso3)}</span>
                     </div>
-                    <h3 className="mt-3 font-medium text-zinc-900 dark:text-white">{crisis.country}</h3>
-                    <p className="text-sm text-zinc-500">{formatNumber(crisis.inNeed)} in need</p>
-                    <div className="mt-3 flex gap-4">
+                    <h3 className="mt-2 font-medium text-neutral-900">{crisis.country}</h3>
+                    <p className="text-xs text-neutral-500">{formatNumber(crisis.inNeed)} in need</p>
+                    <div className="mt-3 flex gap-3 text-xs">
                       <div>
-                        <p className="text-2xl font-semibold tabular-nums text-red-600">{(crisis.needRate * 100).toFixed(0)}%</p>
-                        <p className="text-xs text-zinc-400">need rate</p>
+                        <span className="font-semibold text-neutral-900">{(crisis.needRate * 100).toFixed(0)}%</span>
+                        <span className="text-neutral-400 ml-1">need</span>
                       </div>
                       <div>
-                        <p className="text-2xl font-semibold tabular-nums text-amber-600">{(crisis.coverageRate * 100).toFixed(0)}%</p>
-                        <p className="text-xs text-zinc-400">coverage</p>
+                        <span className="font-semibold text-neutral-900">{(crisis.coverageRate * 100).toFixed(0)}%</span>
+                        <span className="text-neutral-400 ml-1">covered</span>
                       </div>
                     </div>
                   </div>
@@ -165,13 +187,13 @@ export default function Home() {
             </div>
           </section>
 
-          {/* Full Table */}
+          {/* Table Section */}
           <section>
-            <div className="mx-auto max-w-[1400px] px-6 py-12 lg:px-8">
+            <div className="mx-auto max-w-6xl px-6 py-10">
               <DataTable
                 data={countries}
                 title="All Countries"
-                description="Complete crisis metrics for all countries with humanitarian response plans"
+                description="Complete crisis metrics by country"
               />
             </div>
           </section>
@@ -181,71 +203,75 @@ export default function Home() {
       {/* Maps Tab */}
       {activeTab === 'maps' && (
         <div className="flex h-[calc(100vh-48px)] flex-col">
-          {/* Map Controls */}
-          <div className="flex items-center gap-6 border-b border-zinc-100 px-6 py-3 dark:border-zinc-800">
+          {/* Map Controls - minimal */}
+          <div className="flex items-center gap-4 border-b border-neutral-100 px-6 py-2.5">
             <div className="flex items-center gap-2">
-              <label className="text-sm text-zinc-500">Color by</label>
+              <label className="text-xs text-neutral-500">Color</label>
               <select
                 value={mapColorBy}
                 onChange={(e) => setMapColorBy(e.target.value as typeof mapColorBy)}
-                className="rounded border border-zinc-200 bg-white px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                className="rounded border border-neutral-200 bg-white px-2.5 py-1 text-sm text-neutral-700"
               >
                 <option value="needRate">Need Rate</option>
-                <option value="coverageRate">Coverage Rate</option>
-                <option value="usdPerPersonInNeed">USD per Person</option>
-                <option value="mismatch">Mismatch Score</option>
+                <option value="coverageRate">Coverage</option>
+                <option value="usdPerPersonInNeed">$/Person</option>
+                <option value="mismatch">Mismatch</option>
               </select>
             </div>
             <div className="flex items-center gap-2">
-              <label className="text-sm text-zinc-500">Year</label>
+              <label className="text-xs text-neutral-500">Year</label>
               <select
                 value={mapYear}
                 onChange={(e) => setMapYear(Number(e.target.value))}
-                className="rounded border border-zinc-200 bg-white px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                className="rounded border border-neutral-200 bg-white px-2.5 py-1 text-sm text-neutral-700"
               >
                 <option value={2024}>2024</option>
                 <option value={2025}>2025</option>
                 <option value={2026}>2026</option>
               </select>
             </div>
-            <label className="flex items-center gap-2 text-sm">
+            <label className="flex items-center gap-1.5 text-xs">
               <input
                 type="checkbox"
                 checked={showCities}
                 onChange={(e) => setShowCities(e.target.checked)}
-                className="rounded border-zinc-300"
+                className="h-3.5 w-3.5 rounded border-neutral-300"
               />
-              <span className="text-zinc-600 dark:text-zinc-400">Show cities</span>
+              <span className="text-neutral-600">Cities</span>
             </label>
           </div>
 
-          {/* Full Height Map */}
           <div className="flex-1">
             <CrisisMap
               data={countries}
               colorBy={mapColorBy}
               showCities={showCities}
               year={mapYear}
+              onCountrySelect={setSelectedCountry}
             />
           </div>
+
+          <CrisisDetailPanel
+            iso3={selectedCountry}
+            year={mapYear}
+            onClose={() => setSelectedCountry(null)}
+          />
         </div>
       )}
 
       {/* Dataset Viewer */}
       {datasetPath && (
-        <div className="mx-auto max-w-[1400px] px-6 py-8 lg:px-8">
+        <div className="mx-auto max-w-6xl px-6 py-8">
           <DatasetViewer path={datasetPath} />
         </div>
       )}
 
       {/* Notebook Viewer */}
       {notebookPath && (
-        <div className="mx-auto max-w-[1000px] px-6 py-8 lg:px-8">
-          <NotebookViewer
-            notebook={notebooks.get(notebookPath) || null}
-            loading={notebookLoading}
-          />
-        </div>
+        <NotebookViewer
+          notebook={notebooks.get(notebookPath) || null}
+          loading={notebookLoading}
+        />
       )}
     </div>
   );

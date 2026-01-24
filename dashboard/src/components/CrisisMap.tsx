@@ -34,6 +34,7 @@ interface CrisisMapProps {
   colorBy: 'needRate' | 'coverageRate' | 'usdPerPersonInNeed' | 'mismatch';
   showCities: boolean;
   year: number;
+  onCountrySelect?: (iso3: string) => void;
 }
 
 interface CountryProperties {
@@ -88,7 +89,7 @@ function getColor(value: number, metric: string): string {
   return '#7c3aed';
 }
 
-export function CrisisMap({ data, colorBy, showCities, year }: CrisisMapProps) {
+export function CrisisMap({ data, colorBy, showCities, year, onCountrySelect }: CrisisMapProps) {
   const [geoData, setGeoData] = useState<GeoJSONData | null>(null);
   const [mapReady, setMapReady] = useState(false);
 
@@ -137,7 +138,7 @@ export function CrisisMap({ data, colorBy, showCities, year }: CrisisMapProps) {
     if (countryData) {
       const flag = getCountryFlag(iso3);
       layer.bindPopup(`
-        <div style="min-width: 220px; font-family: system-ui, -apple-system, sans-serif;">
+        <div style="min-width: 240px; font-family: system-ui, -apple-system, sans-serif;">
           <div style="font-size: 18px; font-weight: 600; margin-bottom: 4px;">
             ${flag} ${countryData.country}
           </div>
@@ -166,8 +167,21 @@ export function CrisisMap({ data, colorBy, showCities, year }: CrisisMapProps) {
             </div>
             ` : ''}
           </div>
+          <button 
+            onclick="window.dispatchEvent(new CustomEvent('selectCountry', {detail: '${iso3}'}))"
+            style="margin-top: 16px; width: 100%; padding: 8px 16px; background: #3b82f6; color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer;"
+          >
+            View Full Details
+          </button>
         </div>
       `);
+      
+      // Add click handler for the country
+      layer.on('click', () => {
+        if (onCountrySelect) {
+          // Close popup after a short delay to let user see the button
+        }
+      });
     }
   };
 

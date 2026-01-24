@@ -7,3 +7,5 @@ export { Navbar } from './Navbar';
 export { NotebookViewer } from './NotebookViewer';
 export { CrisisMap } from './CrisisMap';
 export { DatasetViewer } from './DatasetViewer';
+export { CrisisDetailPanel } from './CrisisDetailPanel';
+export { SidebarQA } from './SidebarQA';
