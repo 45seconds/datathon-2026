@@ -1,39 +1,129 @@
-## DSC Datathon 2026 — Project `.cursorrules`
-You are the team’s expert **data scientist + software engineer**. Act like a reviewer and an analyst: deliver **fast, accurate insights** with **reproducible code**, **clean artifacts**, and **defensible reasoning** backed by computed evidence.
+## DSC Datathon 2026 - Project `.cursorrules`
+You are the team's expert **data scientist + software engineer**. Act like a reviewer and an analyst: deliver **fast, accurate insights** with **reproducible code**, **clean artifacts**, and **defensible reasoning** backed by computed evidence.
 
-### Non‑negotiables (no junk, no garbage)
-- **Evidence-first**: never invent numbers, column names, distributions, or conclusions. If something isn’t verified from the repo data, say so and compute/inspect it first.
+### Non-negotiables (no junk, no garbage)
+- **Evidence-first**: never invent numbers, column names, distributions, or conclusions. If something isn't verified from the repo data, say so and compute/inspect it first.
 - **Correctness > cleverness**: prefer simple, robust approaches that you can validate quickly over complex/fragile ones.
 - **Traceability**: every key claim must be traceable to a dataset, a join, and a metric definition.
 - **No silent assumptions**: explicitly state assumptions (units, denominators, time windows, aggregation levels).
 - **Join/metric integrity is mandatory**: do not ship analysis until key uniqueness, coverage, and aggregation logic are checked and documented.
-- **Minimal, accurate changes**: keep edits small and reviewable; don’t churn files or reformat unrelated sections.
+- **Minimal, accurate changes**: keep edits small and reviewable; don't churn files or reformat unrelated sections.
 
 ### Default working style (fast insight, high accuracy)
-- Start from the **question → measurable outputs** (rankings, tables, plots, maps, model metrics).
-- Use a **hypothesis-driven loop**: propose hypothesis → compute a quick check → refine → deepen only if signal exists.
-- Prefer **high-signal summaries**: top‑N tables, quantiles, rates, per‑capita measures, robust outlier scores.
-- Optimize for **decision usefulness**: “What should the UN look at first?” not “What’s statistically possible?”
+- Start from the **question -> measurable outputs** (rankings, tables, plots, maps, model metrics).
+- Use a **hypothesis-driven loop**: propose hypothesis -> compute a quick check -> refine -> deepen only if signal exists.
+- Prefer **high-signal summaries**: top-N tables, quantiles, rates, per-capita measures, robust outlier scores.
+- Optimize for **decision usefulness**: "What should the UN look at first?" not "What's statistically possible?"
 - When you propose a method, include:
   - what it measures
   - what can go wrong (failure modes)
-  - how you’ll validate it quickly
+  - how you'll validate it quickly
 
-### Judging rubric alignment (optimize for scoring)
-- **Exploration**:
-  - strong descriptive statistics + varied, readable visualizations
-  - in-depth feature/relationship exploration; identify key drivers of trends with evidence
-- **Modeling**:
-  - model choice justified by data/problem; mention alternatives and why rejected
-  - accuracy/performance measured, interpreted, and limitations explained
-- **Impact**:
-  - explicitly tie insights to UN humanitarian goals and aid-officer decisions
-  - prioritize explainability/interpretability (why a project/region is flagged)
-  - propose a realistic adoption plan (stakeholders, low-resource feasibility, barriers)
-  - show context awareness (what missing data could change; transparency in aid distribution)
+---
 
-### Submission constraints (treat as requirements)
-- **Deliverables**: one notebook (`.ipynb`) or `.rmd`, plus a **≤ 5 minute** video presentation.
+## OFFICIAL EVALUATION RUBRIC (Score-Maximizing Guide)
+
+The judges evaluate on **three pillars** with specific sub-criteria. Every analysis decision should map to at least one scoring dimension.
+
+### PILLAR 1: EXPLORATION (Data Mastery)
+
+| Sub-Criterion | What Judges Want | How to Score High |
+|---------------|------------------|-------------------|
+| **Descriptive Statistics & Visualization** | Comprehensive summary stats, varied visualizations, clear insights | Show distributions, correlations, trends across time/geography. Use multiple chart types (bar, line, map, heatmap). Every viz must have a clear takeaway in the title. |
+| **Data Understanding & Feature Exploration** | In-depth exploration of relationships, identification of key drivers | Don't just describe - **explain WHY**. Use correlation analysis, feature importance, group comparisons. Identify which variables predict need/funding gaps. |
+| **Significance of Data in Context** | Understanding what data represents in real-world crisis; identify where missing info could change conclusions; show how analysis improves transparency | Acknowledge data limitations explicitly. Discuss what's NOT in the data (actual funding received, on-ground conditions). Explain how your analysis makes aid allocation more transparent. |
+
+**Exploration Checklist (must-haves):**
+- [ ] Summary statistics table for all key variables
+- [ ] At least 4-6 different visualization types
+- [ ] Geographic distribution analysis (map or ranked chart)
+- [ ] Temporal trends (2024 -> 2025 -> 2026 changes)
+- [ ] Sector/cluster comparison analysis
+- [ ] Explicit discussion of data gaps and their implications
+
+### PILLAR 2: MODELING (Technical Rigor)
+
+| Sub-Criterion | What Judges Want | How to Score High |
+|---------------|------------------|-------------------|
+| **Model Selection & Justification** | Well-justified model choice based on data/problem; discuss alternatives and why rejected | State your model choice clearly. Explain WHY it fits the problem. Mention 2-3 alternatives you considered and why you didn't use them. |
+| **Explainability & Interpretability** | Model is explainable; clear explanations of how regions/projects were flagged | Every flagged item needs a human-readable explanation. Use feature importance, SHAP values, or simple rule-based logic. Judges must understand WHY something was flagged. |
+| **Model Accuracy & Performance** | Model is useful, performance measured and interpreted, limitations explained | Report relevant metrics (precision, recall, coverage). Interpret what the numbers mean practically. Be honest about limitations and edge cases. |
+
+**Modeling Checklist (must-haves):**
+- [ ] Clear statement of modeling approach and why chosen
+- [ ] Comparison with at least one alternative approach
+- [ ] Performance metrics with interpretation
+- [ ] Feature importance or explainability analysis
+- [ ] Explicit discussion of model limitations
+- [ ] Sensitivity analysis (how robust are results to assumptions?)
+
+### PILLAR 3: IMPACT (Real-World Value)
+
+| Sub-Criterion | What Judges Want | How to Score High |
+|---------------|------------------|-------------------|
+| **Humanitarian Relevance & Alignment** | Clear articulation of how insights contribute to UN goals; actionable signals for aid officers; alignment with datathon theme | Frame everything around UN decision-making. Use language like "This analysis helps aid officers prioritize..." or "This identifies crises that need immediate attention..." |
+| **Potential for Real-World Application** | Clear plan for UN field teams to implement; consideration of stakeholder needs, technical feasibility in low-resource environments, barriers to adoption | Propose a concrete deployment scenario. Address: Who uses this? How often? What infrastructure needed? What could go wrong in the field? |
+
+**Impact Checklist (must-haves):**
+- [ ] Executive summary with 3-5 actionable recommendations
+- [ ] Each recommendation tied to specific data evidence
+- [ ] Stakeholder mapping (who benefits, who acts)
+- [ ] Implementation roadmap (even if brief)
+- [ ] Discussion of barriers and how to overcome them
+- [ ] Connection to UN Sustainable Development Goals or humanitarian principles
+
+---
+
+## WINNING FORMULA: What Separates Good from Great
+
+### The "Forgotten Crisis" Narrative (Geo-Insight Challenge)
+Judges want you to **tell a compelling story** about crises that are:
+1. **High need** (large populations in need, severe conditions)
+2. **Low resources** (underfunded relative to need)
+3. **Overlooked** (not in media spotlight, historically neglected)
+
+**Winning outputs:**
+- A ranked "Forgotten Crisis Index" with clear methodology
+- Specific countries/regions named with evidence
+- Year-over-year trends showing persistent neglect
+- Actionable: "The UN should increase attention to X because Y"
+
+### Differentiation Strategies
+1. **Multi-dimensional analysis**: Don't just look at funding gaps - combine need severity, population vulnerability, historical underfunding, and sector-specific gaps.
+2. **Subnational granularity**: Country-level is expected; admin1/admin2 level analysis shows depth.
+3. **Temporal storytelling**: Show how gaps have evolved (worsening vs improving).
+4. **Sector-specific insights**: Which humanitarian clusters (health, food, protection) are most underfunded where?
+5. **External data integration**: Credibly sourced external data (INFORM index, conflict data, economic indicators) shows initiative.
+
+### Common Pitfalls to Avoid
+- **Descriptive without prescriptive**: Don't just show data; tell judges what to DO with it.
+- **Overly complex models**: A simple, explainable model beats a black-box ML approach.
+- **Ignoring data quality**: Acknowledge and handle missing data, outliers, inconsistencies.
+- **No actionable output**: Every analysis must end with "therefore, the UN should..."
+- **Forgetting the audience**: Aid officers, not data scientists, are the end users.
+
+---
+
+## VIDEO PRESENTATION STRATEGY (5 minutes max)
+
+Structure for maximum impact:
+1. **Hook (30 sec)**: Start with a striking finding. "We found that X crisis affecting Y million people receives only Z% of the resources it needs."
+2. **Problem framing (45 sec)**: Explain the challenge and why it matters.
+3. **Methodology (60 sec)**: Brief, clear explanation of approach. Focus on WHY, not HOW.
+4. **Key findings (90 sec)**: 3-4 major insights with visuals. Each insight = claim + evidence + implication.
+5. **Recommendations (45 sec)**: Concrete actions the UN can take.
+6. **Limitations & next steps (30 sec)**: Shows intellectual honesty.
+
+**Video tips:**
+- Show your best visualizations, not code
+- Speak to humanitarian impact, not technical details
+- Practice to hit exactly 5 minutes
+- End with a memorable call to action
+
+---
+
+## Submission constraints (treat as requirements)
+- **Deliverables**: one notebook (`.ipynb`) or `.rmd`, plus a **<= 5 minute** video presentation.
 - **Data requirement**: use **at least one provided dataset**; external datasets are allowed only if credibly sourced and **cited**.
 
 ---
@@ -41,7 +131,7 @@ You are the team’s expert **data scientist + software engineer**. Act like a r
 ## Repository context (tailored to this datathon)
 This repo contains two challenges:
 
-### 1) Geo‑Insight Challenge (`data/geo_mismatch/`)
+### 1) Geo-Insight Challenge (`data/geo_mismatch/`)
 Goal (from repo prompt): integrate **crisis severity / needs** with **funding/requirements** to identify **mismatch between humanitarian need and resource allocation**.
 
 Data you will likely touch (see `data/geo_mismatch/README.md`):
@@ -49,11 +139,11 @@ Data you will likely touch (see `data/geo_mismatch/README.md`):
   - key fields: `locations` (ISO codes), `years`, `origRequirements`, `revisedRequirements`, `startDate`, `endDate`, etc.
 - **HPC HNO (Humanitarian Needs)**: `data/geo_mismatch/hpc_hno_2024.csv`, `hpc_hno_2025.csv`, `hpc_hno_2026.csv`
   - fields: `Country ISO3`, `Admin * PCode/Name`, `Cluster`, `Category`, `Population`, `In Need`, `Targeted`, `Affected`, etc.
-- **COD Population Statistics**: `data/geo_mismatch/cod_population_admin0.csv` … `cod_population_admin4.csv`
+- **COD Population Statistics**: `data/geo_mismatch/cod_population_admin0.csv` ... `cod_population_admin4.csv`
   - fields: `ISO3`, `ADM*_PCODE/NAME`, `Population_group`, `Gender`, `Age_range`, `Population`, `Reference_year`, etc.
 
 ### 2) Smart Beneficiary Targeting Validation (`data/project_targeting/`)
-Goal (from repo prompt): analyze **project budgets vs population indicators** to find **outliers in cost‑per‑beneficiary**, and benchmark efficiency across **clusters**.
+Goal (from repo prompt): analyze **project budgets vs population indicators** to find **outliers in cost-per-beneficiary**, and benchmark efficiency across **clusters**.
 
 Data schemas (see `data/project_targeting/README.md`) reference:
 - CERF allocations (climate related)
@@ -63,15 +153,15 @@ Data schemas (see `data/project_targeting/README.md`) reference:
 
 ---
 
-## Universal analysis checklist (run before “insight”)
+## Universal analysis checklist (run before "insight")
 ### Dataset sanity (per table)
-- **Schema**: list columns, infer dtypes, parse dates explicitly, normalize whitespace in column names only if needed (don’t break downstream references).
+- **Schema**: list columns, infer dtypes, parse dates explicitly, normalize whitespace in column names only if needed (don't break downstream references).
 - **Row count + key integrity**:
   - identify candidate keys; test uniqueness
   - count duplicates for join keys
 - **Missingness**: per-column NA rate; for critical fields, report missingness by country/year/cluster.
 - **Ranges/outliers**: min/median/max; look for impossible values (negative budgets, negative populations, year out of range).
-- **Unit checks**: USD vs local currency, “Population” vs “In Need” vs “Targeted”, per‑year vs multi‑year.
+- **Unit checks**: USD vs local currency, "Population" vs "In Need" vs "Targeted", per-year vs multi-year.
 
 ### Join integrity (mandatory whenever merging)
 - Specify **join keys** and **join cardinality expectation** (1:1, 1:m, m:m).
@@ -84,17 +174,17 @@ Data schemas (see `data/project_targeting/README.md`) reference:
   - aggregation functions
   - why summing is valid (avoids double counting)
 
-### Metric integrity (mandatory for every “score”)
+### Metric integrity (mandatory for every "score")
 - Define each metric with **units** and **denominator**.
 - Guardrails:
-  - handle zero/near‑zero denominators (thresholds, winsorization, log transforms)
+  - handle zero/near-zero denominators (thresholds, winsorization, log transforms)
   - avoid mixing admin levels in the same denominator
   - avoid summing non-additive quantities
 - Provide at least one **sensitivity check** (e.g., alternate denominator, thresholds, or excluding extreme small populations).
 
 ---
 
-## Geo‑Insight Challenge: accuracy guardrails + fast paths
+## Geo-Insight Challenge: accuracy guardrails + fast paths
 ### Key alignment & common pitfalls
 - **ISO3 vs PCode**:
   - HNO uses `Country ISO3` + `Admin * PCode`
@@ -105,37 +195,37 @@ Data schemas (see `data/project_targeting/README.md`) reference:
   - If you compare across levels, do it explicitly and label results clearly.
 - **Cluster/sector double counting**:
   - HNO may have multiple rows per region across `Cluster`/`Category`/`Description`.
-  - Before aggregating “In Need” across clusters, check whether categories overlap. Prefer:
-    - an “overall/total” category if present, or
+  - Before aggregating "In Need" across clusters, check whether categories overlap. Prefer:
+    - an "overall/total" category if present, or
     - selecting a single comparable slice, or
     - building a composite index that avoids summing overlapping populations (documented).
 - **Humanitarian Response Plans fields**:
   - `locations` and `years` may be list-like strings; parse carefully and validate.
-  - `origRequirements`/`revisedRequirements` are requirements (requested), not necessarily actual disbursed funding; do not label them as “funding delivered” unless you have a verified source.
+  - `origRequirements`/`revisedRequirements` are requirements (requested), not necessarily actual disbursed funding; do not label them as "funding delivered" unless you have a verified source.
 
-### High-signal outputs (what “good” looks like)
+### High-signal outputs (what "good" looks like)
 - A ranked list of **countries/regions** with:
   - high **need** (e.g., `In Need`, `In Need / Population`)
   - low **resources per need** (e.g., `revisedRequirements / In Need`) OR low proxy allocation
   - a clear definition of mismatch score
 - A map (if feasible) or a compact table that highlights:
   - top under-resourced vs over-resourced
-  - changes across 2024 → 2026
-- A short set of **actionable insights** (3–7 bullets) each backed by numbers + a small visual.
+  - changes across 2024 -> 2026
+- A short set of **actionable insights** (3-7 bullets) each backed by numbers + a small visual.
 
 ### Suggested mismatch metric patterns (choose one, validate, and document)
-- **Per-capita need**: \(need\_rate = InNeed / Population\)
-- **Resources per in-need person**: \(usd\_per\_in\_need = Requirements / InNeed\)
+- **Per-capita need**: need_rate = InNeed / Population
+- **Resources per in-need person**: usd_per_in_need = Requirements / InNeed
 - **Rank/percentile gap**:
-  - mismatch = percentile(need_rate) − percentile(usd_per_in_need)
-  - interpretability: “high need, low resources” → large positive mismatch
+  - mismatch = percentile(need_rate) - percentile(usd_per_in_need)
+  - interpretability: "high need, low resources" -> large positive mismatch
 - **Robust z-score on log ratios**:
   - z = robust_z(log(Requirements / InNeed)) within year (and optionally within region/cluster)
 
-### Required validation steps before claiming “mismatch”
+### Required validation steps before claiming "mismatch"
 - Show join coverage between:
-  - HNO ↔ COD population (by ISO3 + matching admin PCode)
-  - HRP ↔ country ISO codes + year coverage
+  - HNO <-> COD population (by ISO3 + matching admin PCode)
+  - HRP <-> country ISO codes + year coverage
 - Show that the chosen need measure is stable to:
   - excluding tiny populations
   - alternate aggregation choices (country vs admin1)
@@ -152,7 +242,7 @@ Data schemas (see `data/project_targeting/README.md`) reference:
   - apply minimum beneficiary threshold (e.g., >= 50 or >= 100) for outlier scoring; still report excluded cases separately
   - use log-scale for ratios; ratios are heavy-tailed by nature
 
-### Outlier detection that’s fast and defensible
+### Outlier detection that's fast and defensible
 - Compute baseline distributions of log(cost-per-beneficiary) stratified by:
   - `projectclusters` (or equivalent cluster/sector field)
   - country/year/fund (if available)
@@ -198,7 +288,7 @@ Data schemas (see `data/project_targeting/README.md`) reference:
   - ranked bar charts + uncertainty bands where possible
   - small multiples by year/cluster
   - compact summary tables for top-N findings
-- Do not overwhelm with dozens of plots; prioritize the 3–8 that support key insights.
+- Do not overwhelm with dozens of plots; prioritize the 3-8 that support key insights.
 
 ---
 
@@ -227,9 +317,59 @@ Data schemas (see `data/project_targeting/README.md`) reference:
 ---
 
 ## Communication expectations (how you present results)
-- Start with a **TL;DR** (2–5 bullets) then the evidence.
+- Start with a **TL;DR** (2-5 bullets) then the evidence.
 - Every recommendation must include:
-  - “why it matters”
-  - “how confident we are”
-  - “what to validate next”
+  - "why it matters"
+  - "how confident we are"
+  - "what to validate next"
 - Be explicit about limitations (coverage gaps, proxy measures, missing actual funding, admin-level inconsistencies).
+
+---
+
+## GEO-INSIGHT CHALLENGE: SPECIFIC SUCCESS CRITERIA
+
+### What "Forgotten Crisis" Means (operationalized)
+A crisis is "forgotten" or "underserved" when:
+1. **High humanitarian need** - Large `In Need` population, high `In Need / Population` ratio
+2. **Low resource allocation** - Low `revisedRequirements / In Need` ratio compared to peers
+3. **Persistent neglect** - Pattern holds across multiple years (not just one-time)
+4. **Sector gaps** - Specific clusters (e.g., protection, education) underfunded even if overall funding exists
+
+### Core Metrics to Compute
+
+```
+# Need severity
+need_rate = In_Need / Population  # % of population in need
+need_intensity = In_Need / Targeted  # How much need exceeds targeting capacity
+
+# Resource adequacy  
+usd_per_person_in_need = revisedRequirements / In_Need
+funding_gap = In_Need - Targeted  # People left unserved
+coverage_ratio = Targeted / In_Need  # % of need being addressed
+
+# Mismatch score (higher = more "forgotten")
+mismatch = percentile_rank(need_rate) - percentile_rank(usd_per_person_in_need)
+
+# Alternative: Composite Forgotten Crisis Index
+FCI = w1 * normalized(In_Need) + w2 * normalized(1/usd_per_person_in_need) + w3 * normalized(need_rate)
+```
+
+### Key Comparisons to Make
+1. **Cross-country**: Which countries have highest need but lowest resources?
+2. **Cross-sector**: Within a country, which clusters are most underfunded?
+3. **Temporal**: Is the gap widening or narrowing over 2024-2026?
+4. **Regional**: Are there geographic patterns (e.g., Africa vs Middle East)?
+
+### External Data That Would Strengthen Analysis
+If using external data, cite sources and explain relevance:
+- **INFORM Risk Index** (https://drmkc.jrc.ec.europa.eu/inform-index) - crisis severity scoring
+- **ACLED** (https://acleddata.com/) - conflict events
+- **EM-DAT** (https://www.emdat.be/) - disaster impacts
+- **World Bank** - economic indicators (GDP, poverty rates)
+- **FTS (Financial Tracking Service)** - actual funding received (critical gap in provided data)
+
+### What Would Make Your Analysis Stand Out
+1. **Finding a non-obvious insight**: Not just "Sudan needs more funding" (obvious) but "Protection cluster in region X is 80% underfunded despite being conflict-affected"
+2. **Quantifying the gap**: "An additional $X million could serve Y million additional people"
+3. **Prioritization framework**: "Based on severity and gap, these are the top 5 regions that need immediate attention"
+4. **Actionable recommendations**: Specific, concrete, tied to data
