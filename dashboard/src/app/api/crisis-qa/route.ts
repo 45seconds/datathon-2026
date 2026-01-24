@@ -21,75 +21,30 @@ interface SectorGap {
   gap: number;
 }
 
-function parseCSVLine(line: string): string[] {
-  const values: string[] = [];
-  let current = '';
-  let inQuotes = false;
-  for (let i = 0; i < line.length; i++) {
-    const char = line[i];
-    if (char === '"') {
-      inQuotes = !inQuotes;
-    } else if (char === ',' && !inQuotes) {
-      values.push(current);
-      current = '';
-    } else {
-      current += char;
-    }
-  }
-  values.push(current);
-  return values;
-}
 
 async function getCountrySectorGaps(iso3: string, year: number): Promise<SectorGap[]> {
   try {
-    const hnoPath = path.join(DATA_DIR, `hpc_hno_${year}.csv`);
-    const content = await fs.readFile(hnoPath, 'utf-8');
-    const lines = content.split('\n').filter((line) => line.trim());
+    if (isSupabaseConfigured()) {
+      // Use Supabase
+      const { supabase } = await import('@/lib/supabase');
+      const { data, error } = await supabase
+        .from('country_cluster_gaps')
+        .select('*')
+        .eq('iso3', iso3)
+        .eq('year', year)
+        .order('coverage_rate', { ascending: true });
 
-    if (lines.length < 2) return [];
+      if (error || !data) return [];
 
-    const headers = lines[0].split(',').map((h) => h.trim());
-    const clusterMap: Record<string, { inNeed: number; targeted: number }> = {};
-
-    for (let i = 2; i < lines.length; i++) {
-      const values = parseCSVLine(lines[i]);
-      if (values.length !== headers.length) continue;
-
-      const row: Record<string, string> = {};
-      headers.forEach((header, idx) => {
-        row[header] = values[idx]?.trim() || '';
-      });
-
-      if (row['Country ISO3'] !== iso3) continue;
-
-      const cluster = row['Cluster'] || '';
-      const category = row['Category'] || '';
-
-      if (cluster === 'ALL' || !cluster || category.includes('-')) continue;
-      if (category.trim() !== '') continue;
-
-      const inNeed = parseFloat(row['In Need']?.replace(/,/g, '') || '0') || 0;
-      const targeted = parseFloat(row['Targeted']?.replace(/,/g, '') || '0') || 0;
-
-      if (!clusterMap[cluster]) {
-        clusterMap[cluster] = { inNeed: 0, targeted: 0 };
-      }
-
-      clusterMap[cluster].inNeed = Math.max(clusterMap[cluster].inNeed, inNeed);
-      clusterMap[cluster].targeted = Math.max(clusterMap[cluster].targeted, targeted);
-    }
-
-    const gaps: SectorGap[] = Object.entries(clusterMap)
-      .filter(([, data]) => data.inNeed > 0)
-      .map(([cluster, data]) => ({
-        cluster,
-        inNeed: data.inNeed,
-        targeted: data.targeted,
-        coverageRate: data.inNeed > 0 ? data.targeted / data.inNeed : 0,
-        gap: data.inNeed - data.targeted,
+      return data.map((row) => ({
+        cluster: row.cluster,
+        inNeed: Number(row.in_need),
+        targeted: Number(row.targeted),
+        coverageRate: Number(row.coverage_rate),
+        gap: Number(row.gap),
       }));
-
-    return gaps.sort((a, b) => a.coverageRate - b.coverageRate);
+    }
+    return [];
   } catch {
     return [];
   }
