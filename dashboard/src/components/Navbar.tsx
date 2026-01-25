@@ -115,6 +115,13 @@ export function Navbar({ activeTab, onTabChange, onToggleChat, chatOpen }: Navba
   return (
     <header className="sticky top-0 z-50 flex h-12 items-center border-b border-neutral-200 bg-white px-6">
       <div className="flex items-center gap-6">
+        {/* Partner Logos */}
+        <div className="flex items-center gap-4 border-r border-neutral-200 pr-6 pl-0">
+          <img src="/cmudatascience_logo.png" alt="CMU Data Science Club" className="h-7 w-auto" title="CMU Data Science Club" />
+          <img src="/databricks_logo.png" alt="Databricks" className="h-6 w-auto" title="Databricks" />
+          <img src="/un_logo.svg.png" alt="United Nations" className="h-7 w-auto" title="United Nations" />
+        </div>
+        
         <span className="text-sm font-medium text-neutral-900">
           DSC Datathon 2026
         </span>
