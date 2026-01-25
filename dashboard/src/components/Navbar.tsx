@@ -157,9 +157,12 @@ export function Navbar({ activeTab, onTabChange, onToggleChat, chatOpen }: Navba
           />
         </div>
         
-        <span className="text-sm font-medium text-neutral-900">
+        <button 
+          onClick={() => handleTabClick('overview')}
+          className="text-sm font-medium text-neutral-900 hover:text-neutral-600 transition-colors cursor-pointer"
+        >
           DSC Datathon 2026
-        </span>
+        </button>
         <nav className="flex items-center">
           <button
             onClick={() => handleTabClick('overview')}
