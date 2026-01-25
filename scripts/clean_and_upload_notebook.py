@@ -185,8 +185,45 @@ def clean_notebook(notebook_path: Path) -> dict:
     return notebook
 
 
+def upload_single_file(client, bucket_name: str, file_path: str, notebook_bytes: bytes) -> bool:
+    """Upload a single file to Supabase storage."""
+    print(f"Uploading to {bucket_name}/{file_path}...")
+    
+    try:
+        # Try to remove existing file first
+        try:
+            client.storage.from_(bucket_name).remove([file_path])
+            print(f"  Removed existing file: {file_path}")
+        except Exception:
+            pass  # File might not exist
+        
+        # Upload new file
+        result = client.storage.from_(bucket_name).upload(
+            file_path,
+            notebook_bytes,
+            file_options={"content-type": "application/json"}
+        )
+        print(f"  Upload successful: {file_path}")
+        return True
+        
+    except Exception as e:
+        print(f"  Upload error for {file_path}: {e}")
+        # Try update instead
+        try:
+            result = client.storage.from_(bucket_name).update(
+                file_path,
+                notebook_bytes,
+                file_options={"content-type": "application/json"}
+            )
+            print(f"  Update successful: {file_path}")
+            return True
+        except Exception as e2:
+            print(f"  Update also failed for {file_path}: {e2}")
+            return False
+
+
 def upload_to_supabase(notebook: dict, filename: str):
-    """Upload the cleaned notebook to Supabase storage."""
+    """Upload the cleaned notebook to Supabase storage (both root and nested paths)."""
     if not SUPABASE_URL or not SUPABASE_SERVICE_KEY:
         print("ERROR: Supabase credentials not found in .env file")
         return False
@@ -200,43 +237,22 @@ def upload_to_supabase(notebook: dict, filename: str):
     
     print(f"Notebook size: {len(notebook_bytes) / 1024:.1f} KB")
     
-    # Upload to notebooks bucket (at root level, not in a subfolder)
     bucket_name = "notebooks"
-    file_path = filename  # Just the filename, not notebooks/filename
     
-    print(f"Uploading to {bucket_name}/{file_path}...")
+    # Upload to both locations for compatibility:
+    # 1. Root level: DSC_Datathon.ipynb
+    # 2. Nested: notebooks/DSC_Datathon.ipynb
+    paths_to_upload = [
+        filename,                      # Root: DSC_Datathon.ipynb
+        f"notebooks/{filename}",       # Nested: notebooks/DSC_Datathon.ipynb
+    ]
     
-    try:
-        # Try to remove existing file first
-        try:
-            client.storage.from_(bucket_name).remove([file_path])
-            print(f"Removed existing file: {file_path}")
-        except Exception:
-            pass  # File might not exist
-        
-        # Upload new file
-        result = client.storage.from_(bucket_name).upload(
-            file_path,
-            notebook_bytes,
-            file_options={"content-type": "application/json"}
-        )
-        print(f"Upload successful!")
-        return True
-        
-    except Exception as e:
-        print(f"Upload error: {e}")
-        # Try upsert instead
-        try:
-            result = client.storage.from_(bucket_name).update(
-                file_path,
-                notebook_bytes,
-                file_options={"content-type": "application/json"}
-            )
-            print(f"Update successful!")
-            return True
-        except Exception as e2:
-            print(f"Update also failed: {e2}")
-            return False
+    success_count = 0
+    for file_path in paths_to_upload:
+        if upload_single_file(client, bucket_name, file_path, notebook_bytes):
+            success_count += 1
+    
+    return success_count > 0
 
 
 def main():
