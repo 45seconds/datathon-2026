@@ -58,10 +58,11 @@ export default function Home() {
     return () => window.removeEventListener('selectCountry', handleSelectCountry as EventListener);
   }, []);
 
-  // Handler for clicking directly on a country in the map (triggers zoom)
-  const handleMapCountryClick = (iso3: string) => {
-    setZoomToCountry(iso3);
-    setTimeout(() => setZoomToCountry(null), 2000);
+  // Handler for clicking directly on a country in the map
+  // Note: Zoom is now handled via custom event in MapZoomController to avoid React re-renders
+  const handleMapCountryClick = (_iso3: string) => {
+    // Zoom is handled by the 'zoomToCountry' custom event dispatched from CrisisMap
+    // This callback is kept for potential future use
   };
 
   useEffect(() => {
@@ -112,9 +113,10 @@ export default function Home() {
   // Handler for clicking on a country in the table
   const handleCountryClick = (iso3: string) => {
     setActiveTab('maps');
-    setZoomToCountry(iso3);
-    // Clear zoom target after animation completes
-    setTimeout(() => setZoomToCountry(null), 2000);
+    // Use custom event for smooth zoom (dispatched after tab change renders)
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('zoomToCountry', { detail: iso3 }));
+    }, 100);
   };
 
   if (loading) {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useRef } from 'react';
 import { useMap } from 'react-leaflet';
 import type { FeatureCollection, Geometry, Position } from 'geojson';
 
@@ -17,7 +17,7 @@ interface MapZoomControllerProps {
   geoData: GeoJSONData | null;
 }
 
-// Pre-calculate country centers from coordinates (faster than creating GeoJSON layers)
+// Calculate center from geometry coordinates
 function calculateCenter(geometry: Geometry): [number, number] | null {
   try {
     const coords: Position[] = [];
@@ -37,7 +37,6 @@ function calculateCenter(geometry: Geometry): [number, number] | null {
     
     if (coords.length === 0) return null;
     
-    // Calculate centroid
     let sumLat = 0, sumLng = 0;
     coords.forEach(([lng, lat]) => {
       sumLng += lng;
@@ -52,17 +51,19 @@ function calculateCenter(geometry: Geometry): [number, number] | null {
 
 export function MapZoomController({ zoomToCountry, geoData }: MapZoomControllerProps) {
   const map = useMap();
+  const countryCentersRef = useRef<Map<string, [number, number]>>(new Map());
+  const lastZoomTargetRef = useRef<string | null>(null);
+  const isAnimatingRef = useRef(false);
 
-  // Pre-calculate centers for all countries (only recalculate when geoData changes)
-  const countryCenters = useMemo(() => {
-    if (!geoData) return new Map<string, [number, number]>();
+  // Build country centers cache once when geoData loads (using ref to avoid re-renders)
+  useEffect(() => {
+    if (!geoData) return;
     
     const centers = new Map<string, [number, number]>();
     
-    // Only process original features (skip world copies with shifted coordinates)
     geoData.features.forEach((f) => {
       const iso3 = f.properties['ISO3166-1-Alpha-3'];
-      if (!iso3 || centers.has(iso3)) return; // Skip duplicates
+      if (!iso3 || centers.has(iso3)) return;
       
       if (f.geometry) {
         const center = calculateCenter(f.geometry);
@@ -72,23 +73,78 @@ export function MapZoomController({ zoomToCountry, geoData }: MapZoomControllerP
       }
     });
     
-    return centers;
+    countryCentersRef.current = centers;
   }, [geoData]);
 
+  // Handle zoom - only zoom if target changed and not already animating
   useEffect(() => {
-    if (!zoomToCountry) return;
+    if (!zoomToCountry || zoomToCountry === lastZoomTargetRef.current) return;
+    if (isAnimatingRef.current) return;
 
-    const center = countryCenters.get(zoomToCountry);
+    const center = countryCentersRef.current.get(zoomToCountry);
     
     if (center) {
+      lastZoomTargetRef.current = zoomToCountry;
+      isAnimatingRef.current = true;
+      
       const UNIVERSAL_ZOOM_LEVEL = 5;
-      // Smooth animation with easing
+      
+      // Disable map interactions during animation for smoother experience
+      map.dragging.disable();
+      map.touchZoom.disable();
+      map.doubleClickZoom.disable();
+      map.scrollWheelZoom.disable();
+      
       map.flyTo(center, UNIVERSAL_ZOOM_LEVEL, { 
-        duration: 1.2,
-        easeLinearity: 0.2  // Lower = more curved easing (smoother start/end)
+        duration: 1.0,
+        easeLinearity: 0.25
       });
+      
+      // Re-enable interactions after animation completes
+      setTimeout(() => {
+        map.dragging.enable();
+        map.touchZoom.enable();
+        map.doubleClickZoom.enable();
+        map.scrollWheelZoom.enable();
+        isAnimatingRef.current = false;
+      }, 1100);
     }
-  }, [zoomToCountry, countryCenters, map]);
+  }, [zoomToCountry, map]);
+
+  // Also listen for custom events (avoids React re-render cycle entirely)
+  useEffect(() => {
+    const handleZoomEvent = (e: CustomEvent<string>) => {
+      if (isAnimatingRef.current) return;
+      
+      const iso3 = e.detail;
+      const center = countryCentersRef.current.get(iso3);
+      
+      if (center) {
+        isAnimatingRef.current = true;
+        
+        map.dragging.disable();
+        map.touchZoom.disable();
+        map.doubleClickZoom.disable();
+        map.scrollWheelZoom.disable();
+        
+        map.flyTo(center, 5, { 
+          duration: 1.0,
+          easeLinearity: 0.25
+        });
+        
+        setTimeout(() => {
+          map.dragging.enable();
+          map.touchZoom.enable();
+          map.doubleClickZoom.enable();
+          map.scrollWheelZoom.enable();
+          isAnimatingRef.current = false;
+        }, 1100);
+      }
+    };
+
+    window.addEventListener('zoomToCountry', handleZoomEvent as EventListener);
+    return () => window.removeEventListener('zoomToCountry', handleZoomEvent as EventListener);
+  }, [map]);
 
   return null;
 }

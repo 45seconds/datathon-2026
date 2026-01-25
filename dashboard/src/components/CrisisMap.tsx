@@ -364,8 +364,11 @@ export function CrisisMap({
         </div>
       `);
       
-      // Trigger zoom when country is clicked
+      // Trigger zoom when country is clicked (use custom event to avoid React re-renders)
       layer.on('click', () => {
+        // Dispatch event for smooth zoom (doesn't trigger React re-render)
+        window.dispatchEvent(new CustomEvent('zoomToCountry', { detail: iso3 }));
+        // Also call the callback if provided (for other purposes)
         if (onCountryClick) {
           onCountryClick(iso3);
         }
