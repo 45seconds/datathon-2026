@@ -34,7 +34,10 @@ export function MapZoomController({ zoomToCountry, geoData }: MapZoomControllerP
         const geoJsonLayer = L.geoJSON(feature);
         const bounds = geoJsonLayer.getBounds();
         if (bounds.isValid()) {
-          map.flyToBounds(bounds, { padding: [50, 50], maxZoom: 6, duration: 1.5 });
+          // Get the center of the country and fly to it with a fixed zoom level
+          const center = bounds.getCenter();
+          const UNIVERSAL_ZOOM_LEVEL = 5; // Consistent zoom for all countries
+          map.flyTo(center, UNIVERSAL_ZOOM_LEVEL, { duration: 1.5 });
         }
       } catch (error) {
         console.error('Error zooming to country:', error);
