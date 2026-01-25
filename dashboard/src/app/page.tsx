@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Navbar, DataTable, NotebookViewer, CrisisMap, DatasetViewer, CrisisDetailPanel, SidebarQA, AIChatSidebar, PredictionsView } from '@/components';
+import { Navbar, DataTable, NotebookViewer, CrisisMap, DatasetViewer, CrisisDetailPanel, AIChatSidebar } from '@/components';
 import { CountryCrisisMetrics, DashboardSummary } from '@/types';
 import { getCountryFlag } from '@/lib/flags';
 import type { Ipynb } from 'react-ipynb-renderer';
@@ -41,15 +41,21 @@ export default function Home() {
 
   // Map state
   const [mapColorBy, setMapColorBy] = useState<'needRate' | 'coverageRate' | 'usdPerPersonInNeed' | 'mismatch'>('needRate');
-  const [showCities, setShowCities] = useState(true);
   const [mapYear, setMapYear] = useState(2026);
   const [mapLanguage, setMapLanguage] = useState<UNLanguage>('en');
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
-  const [showQA, setShowQA] = useState(false);
   const [zoomToCountry, setZoomToCountry] = useState<string | null>(null);
   const [showAIChat, setShowAIChat] = useState(false);
+  const [aiCountryFocus, setAiCountryFocus] = useState<{ iso3: string; name: string; context: string } | null>(null);
 
-  // Listen for country selection from map popup button
+  // Handler for opening AI chat with country context
+  const handleAskAIAboutCountry = (iso3: string, name: string, context: string) => {
+    setAiCountryFocus({ iso3, name, context });
+    setSelectedCountry(null); // Close the detail panel
+    setShowAIChat(true);
+  };
+
+  // Listen for country selection from map popup button (for "View Full Details")
   useEffect(() => {
     const handleSelectCountry = (e: CustomEvent<string>) => {
       setSelectedCountry(e.detail);
@@ -57,6 +63,12 @@ export default function Home() {
     window.addEventListener('selectCountry', handleSelectCountry as EventListener);
     return () => window.removeEventListener('selectCountry', handleSelectCountry as EventListener);
   }, []);
+
+  // Handler for clicking directly on a country in the map (triggers zoom)
+  const handleMapCountryClick = (iso3: string) => {
+    setZoomToCountry(iso3);
+    setTimeout(() => setZoomToCountry(null), 4000);
+  };
 
   useEffect(() => {
     async function fetchData() {
@@ -107,8 +119,7 @@ export default function Home() {
   const handleCountryClick = (iso3: string) => {
     setActiveTab('maps');
     setZoomToCountry(iso3);
-    // Clear zoom target after animation completes
-    setTimeout(() => setZoomToCountry(null), 2000);
+    setTimeout(() => setZoomToCountry(null), 4000);
   };
 
   if (loading) {
@@ -131,21 +142,14 @@ export default function Home() {
         chatOpen={showAIChat}
       />
 
-      {/* Q&A Toggle Button - minimal style */}
-      <button
-        onClick={() => setShowQA(!showQA)}
-        className="fixed bottom-6 left-6 z-50 flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-4 py-2.5 text-sm text-neutral-700 shadow-sm transition-all hover:bg-neutral-50"
-      >
-        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        {showQA ? 'Close' : 'Ask'}
-      </button>
-
-      <SidebarQA isOpen={showQA} onClose={() => setShowQA(false)} />
       
       {/* AI Chat Sidebar */}
-      <AIChatSidebar isOpen={showAIChat} onClose={() => setShowAIChat(false)} />
+      <AIChatSidebar 
+        isOpen={showAIChat} 
+        onClose={() => setShowAIChat(false)} 
+        countryFocus={aiCountryFocus}
+        onClearCountryFocus={() => setAiCountryFocus(null)}
+      />
 
       {/* Main content wrapper - adjusts when AI chat is open */}
       <div className={`transition-all duration-300 ${showAIChat ? 'mr-[400px]' : ''}`}>
@@ -282,24 +286,15 @@ export default function Home() {
                 <option value={2026}>2026</option>
               </select>
             </div>
-            <label className="flex items-center gap-1.5 text-xs">
-              <input
-                type="checkbox"
-                checked={showCities}
-                onChange={(e) => setShowCities(e.target.checked)}
-                className="h-3.5 w-3.5 rounded border-neutral-300"
-              />
-              <span className="text-neutral-600">Cities</span>
-            </label>
           </div>
 
           <div className="flex-1">
             <CrisisMap
               data={countries}
               colorBy={mapColorBy}
-              showCities={showCities}
               year={mapYear}
               onCountrySelect={setSelectedCountry}
+              onCountryClick={handleMapCountryClick}
               zoomToCountry={zoomToCountry}
               language={mapLanguage}
             />
@@ -309,12 +304,10 @@ export default function Home() {
             iso3={selectedCountry}
             year={mapYear}
             onClose={() => setSelectedCountry(null)}
+            onAskAI={handleAskAIAboutCountry}
           />
         </div>
       )}
-
-      {/* Predictions Tab */}
-      {activeTab === 'predictions' && <PredictionsView />}
 
       {/* Dataset Viewer */}
       {datasetPath && (

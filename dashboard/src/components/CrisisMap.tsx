@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import type { CountryCrisisMetrics } from '@/types';
-import { getCitiesForCountries, City } from '@/lib/cities';
 import { getCountryFlag } from '@/lib/flags';
 import type { Feature, FeatureCollection, Geometry } from 'geojson';
 import type { Layer, PathOptions } from 'leaflet';
@@ -162,9 +161,9 @@ const MAP_I18N: Record<
 interface CrisisMapProps {
   data: CountryCrisisMetrics[];
   colorBy: 'needRate' | 'coverageRate' | 'usdPerPersonInNeed' | 'mismatch';
-  showCities: boolean;
   year: number;
   onCountrySelect?: (iso3: string) => void;
+  onCountryClick?: (iso3: string) => void;
   zoomToCountry?: string | null;
   language?: UNLanguage;
 }
@@ -265,9 +264,9 @@ function getColor(value: number, metric: string): string {
 export function CrisisMap({
   data,
   colorBy,
-  showCities,
   year,
   onCountrySelect,
+  onCountryClick,
   zoomToCountry,
   language = 'en',
 }: CrisisMapProps) {
@@ -290,11 +289,6 @@ export function CrisisMap({
     const map = new Map<string, CountryCrisisMetrics>();
     data.forEach((d) => map.set(d.iso3, d));
     return map;
-  }, [data]);
-
-  const cities = useMemo(() => {
-    const iso3Codes = data.map((d) => d.iso3);
-    return getCitiesForCountries(iso3Codes);
   }, [data]);
 
   const style = (feature: CountryFeature | undefined): PathOptions => {
@@ -362,10 +356,12 @@ export function CrisisMap({
         </div>
       `);
       
-      // Ensure map layer is clickable (no-op; popup handles interaction)
-      if (onCountrySelect) {
-        layer.on('click', () => {});
-      }
+      // Trigger zoom when country is clicked
+      layer.on('click', () => {
+        if (onCountryClick) {
+          onCountryClick(iso3);
+        }
+      });
     }
   };
 
@@ -387,6 +383,7 @@ export function CrisisMap({
         style={{ height: '100%', width: '100%' }}
         scrollWheelZoom={true}
         worldCopyJump={true}
+        preferCanvas={true}
         className="z-0"
       >
         <MapZoomController zoomToCountry={zoomToCountry || null} geoData={geoData} />
@@ -394,6 +391,7 @@ export function CrisisMap({
         <TileLayer
           attribution='&copy; <a href="https://carto.com/">CARTO</a>'
           url="https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png"
+          keepBuffer={4}
         />
         {geoData && (
           <GeoJSON
@@ -403,31 +401,11 @@ export function CrisisMap({
             onEachFeature={onEachFeature}
           />
         )}
-        {showCities &&
-          cities.map((city: City) => (
-            <CircleMarker
-              key={`${city.iso3}-${city.name}`}
-              center={[city.lat, city.lng]}
-              radius={city.type === 'capital' ? 7 : 5}
-              pathOptions={{
-                fillColor: city.type === 'capital' ? '#f59e0b' : '#3b82f6',
-                color: '#fff',
-                weight: 2,
-                opacity: 1,
-                fillOpacity: 1,
-              }}
-            >
-              <Tooltip direction="top" offset={[0, -8]} opacity={1}>
-                <span className="text-sm font-medium">
-                  {city.name}
-                  {city.type === 'capital' && ` (${t.capital})`}
-                  {city.population && ` · ${formatNumber(city.population)}`}
-                </span>
-              </Tooltip>
-            </CircleMarker>
-          ))}
         {/* Basemap labels overlay (few labels at low zoom, more as you zoom in) */}
-        <TileLayer url="https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png" />
+        <TileLayer 
+          url="https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png"
+          keepBuffer={4}
+        />
       </MapContainer>
 
       {/* Legend */}
@@ -484,18 +462,6 @@ export function CrisisMap({
           <span>{t.low}</span>
           <span>{t.high}</span>
         </div>
-        {showCities && (
-          <div className="mt-4 flex items-center gap-4 border-t border-zinc-200 pt-3 dark:border-zinc-700">
-            <div className="flex items-center gap-2">
-              <div className="h-3 w-3 rounded-full bg-amber-500" />
-              <span className="text-xs text-zinc-500">{t.capital}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="h-2.5 w-2.5 rounded-full bg-blue-500" />
-              <span className="text-xs text-zinc-500">{t.majorCity}</span>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

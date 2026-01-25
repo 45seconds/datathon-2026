@@ -10,4 +10,3 @@ export { DatasetViewer } from './DatasetViewer';
 export { CrisisDetailPanel } from './CrisisDetailPanel';
 export { SidebarQA } from './SidebarQA';
 export { default as AIChatSidebar } from './AIChatSidebar';
-export { PredictionsView } from './PredictionsView';

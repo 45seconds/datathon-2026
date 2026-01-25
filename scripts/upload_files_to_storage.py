@@ -23,6 +23,8 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 # Paths
 PROJECT_ROOT = Path(__file__).parent.parent
 DATA_DIR = PROJECT_ROOT / "data" / "geo_mismatch"
+PROJECT_TARGETING_DIR = PROJECT_ROOT / "data" / "project_targeting"
+OUTPUTS_DIR = PROJECT_ROOT / "outputs"
 NOTEBOOKS_DIR = PROJECT_ROOT / "notebooks"
 
 def create_bucket_if_not_exists(bucket_name: str):
@@ -70,13 +72,54 @@ def main():
     create_bucket_if_not_exists("notebooks")
     
     print()
-    print("Uploading CSV files...")
+    print("Uploading geo_mismatch CSV files...")
     print("-" * 60)
     
-    # Upload CSV files
+    # Upload geo_mismatch CSV files
     csv_files = list(DATA_DIR.glob("*.csv"))
     for csv_file in csv_files:
         upload_file("datasets", csv_file, f"geo_mismatch/{csv_file.name}")
+    
+    print()
+    print("Uploading project_targeting CSV files...")
+    print("-" * 60)
+    
+    # Upload project_targeting CSV files (from zip)
+    import zipfile
+    zip_path = PROJECT_TARGETING_DIR / "project_targeting_data.zip"
+    if zip_path.exists():
+        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+            # Extract CSV files temporarily
+            temp_dir = PROJECT_ROOT / ".temp_extract"
+            temp_dir.mkdir(exist_ok=True)
+            
+            for file_info in zip_ref.filelist:
+                if file_info.filename.endswith('.csv') and not file_info.filename.startswith('__MACOSX'):
+                    # Extract to temp
+                    zip_ref.extract(file_info, temp_dir)
+                    extracted_path = temp_dir / file_info.filename
+                    
+                    # Upload with original filename
+                    filename = Path(file_info.filename).name
+                    upload_file("datasets", extracted_path, f"project_targeting/{filename}")
+            
+            # Cleanup
+            import shutil
+            shutil.rmtree(temp_dir)
+    else:
+        print(f"  Warning: {zip_path} not found, skipping project_targeting files")
+    
+    print()
+    print("Uploading Challenge 1 outputs...")
+    print("-" * 60)
+    
+    # Upload Challenge 1 outputs
+    if OUTPUTS_DIR.exists():
+        output_files = list(OUTPUTS_DIR.glob("challenge1_*.csv"))
+        for output_file in output_files:
+            upload_file("datasets", output_file, f"outputs/{output_file.name}")
+    else:
+        print(f"  Warning: {OUTPUTS_DIR} not found, skipping outputs")
     
     print()
     print("Uploading notebooks...")
