@@ -1,0 +1,5 @@
+code,title,value,latest_date,source,source_link,notes,explore,units
+cerf_01,Amount Approved,9918565668,2026-01-23,Central Emergency Response Fund (CERF),http://cerfgms-webapi.unocha.org/v1/KeyFigures/All.json,Amount Approved,,dollars_billion
+cerf_02,Countries Assisted,116,2024-07-26,Central Emergency Response Fund (CERF),http://cerfgms-webapi.unocha.org/v1/KeyFigures/All.json,Countries Assisted,,count
+cerf_03,Amount Received,10007135081,2026-01-22,Central Emergency Response Fund (CERF),http://cerfgms-webapi.unocha.org/v1/KeyFigures/All.json,Amount Received,,dollars_billion
+cerf_04,No. of Member States Contributing,136,2025-09-14,Central Emergency Response Fund (CERF),http://cerfgms-webapi.unocha.org/v1/KeyFigures/All.json,No. of Member States Contributing,,count

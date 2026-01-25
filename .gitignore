@@ -3,3 +3,10 @@
 __pycache__/
 *.pyc
 .pytest_cache/
+.agent/skills
+
+# Exclude specific scripts as requested
+scripts/clean_inform_data.py
+scripts/merge_notebooks.py
+scripts/analyze_inform_data.py
+analyze_inform_data.py
