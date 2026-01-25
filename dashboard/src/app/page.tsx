@@ -61,7 +61,7 @@ export default function Home() {
   // Handler for clicking directly on a country in the map (triggers zoom)
   const handleMapCountryClick = (iso3: string) => {
     setZoomToCountry(iso3);
-    setTimeout(() => setZoomToCountry(null), 3000);
+    setTimeout(() => setZoomToCountry(null), 4000);
   };
 
   useEffect(() => {
@@ -113,7 +113,7 @@ export default function Home() {
   const handleCountryClick = (iso3: string) => {
     setActiveTab('maps');
     setZoomToCountry(iso3);
-    setTimeout(() => setZoomToCountry(null), 3000);
+    setTimeout(() => setZoomToCountry(null), 4000);
   };
 
   if (loading) {

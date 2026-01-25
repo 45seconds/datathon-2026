@@ -36,10 +36,10 @@ export function MapZoomController({ zoomToCountry, geoData }: MapZoomControllerP
         if (bounds.isValid()) {
           const center = bounds.getCenter();
           const UNIVERSAL_ZOOM_LEVEL = 5;
-          // Slow, smooth animation
+          // Slow, constant speed animation
           map.flyTo(center, UNIVERSAL_ZOOM_LEVEL, { 
-            duration: 2.5,
-            easeLinearity: 0.1
+            duration: 3.5,
+            easeLinearity: 1.0  // 1.0 = linear/constant speed
           });
         }
       } catch (error) {
