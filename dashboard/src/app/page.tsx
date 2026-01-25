@@ -50,7 +50,7 @@ export default function Home() {
   const [showAIChat, setShowAIChat] = useState(false);
   const [aiCountryFocus, setAiCountryFocus] = useState<{ countryName: string; context: string } | null>(null);
 
-  // Listen for country selection from map popup button
+  // Listen for country selection from map popup button (for "View Full Details")
   useEffect(() => {
     const handleSelectCountry = (e: CustomEvent<string>) => {
       setSelectedCountry(e.detail);
@@ -58,6 +58,12 @@ export default function Home() {
     window.addEventListener('selectCountry', handleSelectCountry as EventListener);
     return () => window.removeEventListener('selectCountry', handleSelectCountry as EventListener);
   }, []);
+
+  // Handler for clicking directly on a country in the map (triggers zoom)
+  const handleMapCountryClick = (iso3: string) => {
+    setZoomToCountry(iso3);
+    setTimeout(() => setZoomToCountry(null), 2000);
+  };
 
   useEffect(() => {
     async function fetchData() {
@@ -313,6 +319,7 @@ export default function Home() {
               showCities={showCities}
               year={mapYear}
               onCountrySelect={setSelectedCountry}
+              onCountryClick={handleMapCountryClick}
               zoomToCountry={zoomToCountry}
               language={mapLanguage}
             />

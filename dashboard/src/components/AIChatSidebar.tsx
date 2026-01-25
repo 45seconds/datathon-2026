@@ -736,14 +736,6 @@ export default function AIChatSidebar({ isOpen, onClose, countryFocus, onClearCo
             </svg>
           </button>
         </div>
-        {activeCountryTag && (
-          <p className="mt-1.5 text-xs text-amber-600 text-center">
-            Asking with {activeCountryTag} crisis context
-          </p>
-        )}
-        <p className="mt-2 text-xs text-neutral-400 text-center">
-          Powered by Cerebras • Data from HPC, INFORM, OCHA
-        </p>
       </form>
     </div>
   );
