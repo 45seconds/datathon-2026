@@ -130,6 +130,7 @@ export function Navbar({ activeTab, onTabChange, onToggleChat, chatOpen }: Navba
 
   const isOverview = activeTab === 'overview';
   const isMaps = activeTab === 'maps';
+  const isPredictions = activeTab === 'predictions';
 
   return (
     <header className="sticky top-0 z-50 flex h-12 items-center border-b border-neutral-200 bg-white px-6">
@@ -181,6 +182,14 @@ export function Navbar({ activeTab, onTabChange, onToggleChat, chatOpen }: Navba
             }`}
           >
             Maps
+          </button>
+          <button
+            onClick={() => handleTabClick('predictions')}
+            className={`px-3 py-1.5 text-sm transition-colors ${
+              isPredictions ? 'text-neutral-900' : 'text-neutral-500 hover:text-neutral-900'
+            }`}
+          >
+            Predictions
           </button>
           <Dropdown
             label="Datasets"

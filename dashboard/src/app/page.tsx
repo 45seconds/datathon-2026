@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Navbar, DataTable, NotebookViewer, CrisisMap, DatasetViewer, CrisisDetailPanel, AIChatSidebar } from '@/components';
+import { Navbar, DataTable, NotebookViewer, CrisisMap, DatasetViewer, CrisisDetailPanel, AIChatSidebar, PredictionsView } from '@/components';
 import { CountryCrisisMetrics, DashboardSummary } from '@/types';
 import { getCountryFlag } from '@/lib/flags';
 import type { Ipynb } from 'react-ipynb-renderer';
@@ -308,6 +308,9 @@ export default function Home() {
           />
         </div>
       )}
+
+      {/* Predictions Tab */}
+      {activeTab === 'predictions' && <PredictionsView />}
 
       {/* Dataset Viewer */}
       {datasetPath && (

@@ -1,0 +1,49 @@
+{
+  "model_type": "rf",
+  "best_params": {
+    "n_estimators": 440,
+    "max_depth": 20,
+    "min_samples_split": 4,
+    "min_samples_leaf": 1,
+    "max_features": null,
+    "random_state": 42
+  },
+  "metrics": {
+    "mae": 99670454.43077497,
+    "rmse": 268507459.94133127,
+    "r2": 0.9916992439601764,
+    "mape": 3.864110254902132,
+    "medae": 29529929.871424675
+  },
+  "feature_names": [
+    "revisedRequirements",
+    "INFORM Severity Index",
+    "Plan_Count",
+    "CERF_Funding",
+    "CBPF_Budget",
+    "Total_Actual_Funding",
+    "log_requirements",
+    "log_actual_funding",
+    "coverage_rate",
+    "coverage_deficit",
+    "funding_per_plan",
+    "severity_squared",
+    "severity_x_year",
+    "years_since_2020",
+    "is_recent",
+    "country_avg_gap",
+    "country_std_gap",
+    "country_max_gap",
+    "country_avg_coverage",
+    "country_min_coverage",
+    "country_avg_severity",
+    "country_std_severity",
+    "gap_yoy_change",
+    "severity_yoy_change",
+    "Country_ISO3"
+  ],
+  "trained_on": "2026-01-25 05:37:49.489192",
+  "train_years": "2020-2023",
+  "val_year": 2024,
+  "test_year": 2025
+}

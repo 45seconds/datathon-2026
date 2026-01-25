@@ -1,3 +1,13 @@
-pandas>=2.0.0
-supabase>=2.0.0
-python-dotenv>=1.0.0
+pandas
+numpy
+scikit-learn
+matplotlib
+seaborn
+requests
+python-dotenv
+supabase
+mlflow
+optuna
+xgboost
+lightgbm
+joblib
