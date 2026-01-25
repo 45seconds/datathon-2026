@@ -60,6 +60,12 @@ def main():
     
     # Files to upload (prioritized list)
     files_to_upload = [
+        # Core dashboard source datasets (small but frequently updated)
+        ("data/geo_mismatch/humanitarian-response-plans.csv", "geo_mismatch/humanitarian-response-plans.csv"),
+        ("data/geo_mismatch/hpc_hno_2026.csv", "geo_mismatch/hpc_hno_2026.csv"),
+        ("data/geo_mismatch/fts_country_monthly_funding.csv", "geo_mismatch/fts_country_monthly_funding.csv"),
+        ("data/geo_mismatch/fts_plan_monthly_funding.csv", "geo_mismatch/fts_plan_monthly_funding.csv"),
+
         # Aggregated analysis datasets (small, high-value)
         ("data/geo_mismatch/country_year_severity_funding.csv", "geo_mismatch/country_year_severity_funding.csv"),
         ("data/geo_mismatch/hrp_inform_aggregated_for_analysis.csv", "geo_mismatch/hrp_inform_aggregated_for_analysis.csv"),

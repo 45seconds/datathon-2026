@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { CrisisDetail } from '@/types';
 import { getCountryFlag } from '@/lib/flags';
 
@@ -68,6 +68,354 @@ function formatDriver(driver: string): string {
   return formattedParts.join(', ');
 }
 
+type SeriesPoint = { year: number; value: number };
+
+function fitLinearTrend(points: SeriesPoint[]): { slope: number; intercept: number } | null {
+  if (points.length < 2) return null;
+  const n = points.length;
+  const sumX = points.reduce((acc, p) => acc + p.year, 0);
+  const sumY = points.reduce((acc, p) => acc + p.value, 0);
+  const sumXX = points.reduce((acc, p) => acc + p.year * p.year, 0);
+  const sumXY = points.reduce((acc, p) => acc + p.year * p.value, 0);
+
+  const denom = n * sumXX - sumX * sumX;
+  if (denom === 0) return null;
+
+  const slope = (n * sumXY - sumX * sumY) / denom;
+  const intercept = (sumY - slope * sumX) / n;
+  if (!Number.isFinite(slope) || !Number.isFinite(intercept)) return null;
+
+  return { slope, intercept };
+}
+
+function clampNumber(value: number, clamp?: { min?: number; max?: number }): number {
+  let v = value;
+  if (typeof clamp?.min === 'number') v = Math.max(clamp.min, v);
+  if (typeof clamp?.max === 'number') v = Math.min(clamp.max, v);
+  return v;
+}
+
+function yearRange(startYear: number, endYear: number): number[] {
+  const years: number[] = [];
+  for (let y = startYear; y <= endYear; y++) years.push(y);
+  return years;
+}
+
+function buildRegression(
+  historical: SeriesPoint[],
+  startYear: number,
+  endYear: number,
+  clamp?: { min?: number; max?: number }
+): { line: SeriesPoint[]; forecast: SeriesPoint[]; endValue?: number } {
+  const hist = [...historical].sort((a, b) => a.year - b.year);
+  if (hist.length === 0) return { line: [], forecast: [] };
+
+  const model = hist.length >= 2 ? fitLinearTrend(hist) : { slope: 0, intercept: hist[0].value };
+  if (!model) return { line: [], forecast: [] };
+
+  const yrs = yearRange(startYear, endYear);
+  const line = yrs
+    .map((y) => ({ year: y, value: clampNumber(model.intercept + model.slope * y, clamp) }))
+    .filter((p) => Number.isFinite(p.value));
+
+  const lastYear = hist[hist.length - 1].year;
+  const forecast = yrs
+    .filter((y) => y > lastYear)
+    .map((y) => ({ year: y, value: clampNumber(model.intercept + model.slope * y, clamp) }))
+    .filter((p) => Number.isFinite(p.value));
+
+  const endValue = clampNumber(model.intercept + model.slope * endYear, clamp);
+
+  return { line, forecast, endValue: Number.isFinite(endValue) ? endValue : undefined };
+}
+
+function holtFitAndForecast(
+  historical: SeriesPoint[],
+  endYear: number,
+  clamp?: { min?: number; max?: number }
+): { alpha: number; beta: number; forecast: SeriesPoint[]; endValue?: number } | null {
+  const hist = [...historical].sort((a, b) => a.year - b.year);
+  if (hist.length === 0) return null;
+
+  const lastYear = hist[hist.length - 1].year;
+  if (lastYear >= endYear) return { alpha: 0.5, beta: 0.1, forecast: [] };
+
+  // If we only have one point, carry it forward.
+  if (hist.length === 1) {
+    const forecast = yearRange(lastYear + 1, endYear).map((y) => ({
+      year: y,
+      value: clampNumber(hist[0].value, clamp),
+    }));
+    const endValue = forecast[forecast.length - 1]?.value;
+    return { alpha: 1, beta: 0, forecast, endValue };
+  }
+
+  const y = hist.map((p) => p.value);
+  const n = y.length;
+
+  // Grid search for (alpha, beta) minimizing one-step-ahead SSE.
+  let best: { alpha: number; beta: number; sse: number } | null = null;
+  for (let a = 0.2; a <= 0.9; a += 0.1) {
+    for (let b = 0.0; b <= 0.8; b += 0.1) {
+      let level = y[0];
+      let trend = y[1] - y[0];
+      let sse = 0;
+
+      for (let t = 1; t < n; t++) {
+        const oneStep = level + trend;
+        const err = y[t] - oneStep;
+        sse += err * err;
+
+        const nextLevel = a * y[t] + (1 - a) * (level + trend);
+        const nextTrend = b * (nextLevel - level) + (1 - b) * trend;
+        level = nextLevel;
+        trend = nextTrend;
+      }
+
+      if (!best || sse < best.sse) {
+        best = { alpha: a, beta: b, sse };
+      }
+    }
+  }
+
+  const alpha = best?.alpha ?? 0.6;
+  const beta = best?.beta ?? 0.2;
+
+  // Re-run with best params to get final level/trend.
+  let level = y[0];
+  let trend = y[1] - y[0];
+  for (let t = 1; t < n; t++) {
+    const nextLevel = alpha * y[t] + (1 - alpha) * (level + trend);
+    const nextTrend = beta * (nextLevel - level) + (1 - beta) * trend;
+    level = nextLevel;
+    trend = nextTrend;
+  }
+
+  const forecast = yearRange(lastYear + 1, endYear).map((yr, idx) => {
+    const m = idx + 1;
+    const value = clampNumber(level + m * trend, clamp);
+    return { year: yr, value };
+  });
+
+  const endValue = forecast[forecast.length - 1]?.value;
+  return { alpha, beta, forecast, endValue: Number.isFinite(endValue) ? endValue : undefined };
+}
+
+function ForecastScatterPlot({
+  title,
+  endYear,
+  historical,
+  formatValue,
+  color,
+  clamp,
+}: {
+  title: string;
+  endYear: number;
+  historical: SeriesPoint[];
+  formatValue: (value: number) => string;
+  color: string;
+  clamp?: { min?: number; max?: number };
+}) {
+  const width = 340;
+  const height = 96;
+  const padL = 46;
+  const padR = 10;
+  const padT = 12;
+  const padB = 22;
+  const labelH = 16;
+  const svgHeight = height + labelH;
+
+  const hist = [...historical].sort((a, b) => a.year - b.year);
+  if (hist.length < 1) return null;
+
+  const startYear = hist[0].year;
+  const lastHistYear = hist[hist.length - 1].year;
+  const xEndYear = Math.max(endYear, lastHistYear);
+
+  const regression = buildRegression(hist, startYear, xEndYear, clamp);
+  const holt = holtFitAndForecast(hist, xEndYear, clamp);
+  const holtLine: SeriesPoint[] = holt ? [hist[hist.length - 1], ...holt.forecast] : [];
+
+  const allVals = [
+    ...hist.map((p) => p.value),
+    ...regression.line.map((p) => p.value),
+    ...holtLine.map((p) => p.value),
+  ].filter((v) => Number.isFinite(v));
+
+  if (allVals.length < 2) return null;
+
+  let minVal = Math.min(...allVals);
+  let maxVal = Math.max(...allVals);
+  if (minVal === maxVal) {
+    minVal -= 1;
+    maxVal += 1;
+  }
+
+  const xForYear = (year: number) => {
+    if (xEndYear === startYear) return padL;
+    const t = (year - startYear) / (xEndYear - startYear);
+    return padL + t * (width - padL - padR);
+  };
+
+  const yForValue = (value: number) => {
+    const t = (value - minVal) / (maxVal - minVal);
+    return height - padB - t * (height - padT - padB);
+  };
+
+  const toPolyline = (pts: SeriesPoint[]) => pts.map((p) => `${xForYear(p.year)},${yForValue(p.value)}`).join(' ');
+
+  const regLinePoints = regression.line.length >= 2 ? toPolyline(regression.line) : '';
+  const holtLinePoints = holtLine.length >= 2 ? toPolyline(holtLine) : '';
+
+  const reg2030 = regression.endValue;
+  const ts2030 = holt?.endValue;
+
+  const midVal = (minVal + maxVal) / 2;
+  const yTop = yForValue(maxVal);
+  const yMid = yForValue(midVal);
+  const yBot = yForValue(minVal);
+
+  const xSeparator = xForYear(lastHistYear);
+  const xTicks = Array.from(new Set([startYear, lastHistYear, xEndYear])).sort((a, b) => a - b);
+
+  return (
+    <div className="rounded border border-neutral-100 px-3 py-2.5">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-sm font-medium text-neutral-900">{title}</p>
+          <p className="text-[11px] text-neutral-500">
+            Actual points + regression (solid) + time-series (dashed)
+          </p>
+        </div>
+        {(reg2030 !== undefined || ts2030 !== undefined) && (
+          <div className="text-right leading-tight">
+            <p className="text-[11px] text-neutral-500">{xEndYear} est.</p>
+            <p className="text-[11px] text-neutral-700">
+              {reg2030 !== undefined ? `Reg ${formatValue(reg2030)}` : ''}
+              {reg2030 !== undefined && ts2030 !== undefined ? ' · ' : ''}
+              {ts2030 !== undefined ? `TS ${formatValue(ts2030)}` : ''}
+            </p>
+          </div>
+        )}
+      </div>
+
+      <svg
+        viewBox={`0 0 ${width} ${svgHeight}`}
+        className="mt-2 h-28 w-full"
+        role="img"
+        aria-label={`${title} forecast scatterplot`}
+      >
+        {/* Horizontal grid */}
+        <line x1={padL} x2={width - padR} y1={yTop} y2={yTop} stroke="#e5e7eb" strokeWidth={1} />
+        <line x1={padL} x2={width - padR} y1={yMid} y2={yMid} stroke="#f3f4f6" strokeWidth={1} />
+        <line x1={padL} x2={width - padR} y1={yBot} y2={yBot} stroke="#e5e7eb" strokeWidth={1} />
+
+        {/* Y labels */}
+        <text x={6} y={yTop + 3} className="fill-neutral-400 text-[10px]">
+          {formatValue(maxVal)}
+        </text>
+        <text x={6} y={yMid + 3} className="fill-neutral-400 text-[10px]">
+          {formatValue(midVal)}
+        </text>
+        <text x={6} y={yBot + 3} className="fill-neutral-400 text-[10px]">
+          {formatValue(minVal)}
+        </text>
+
+        {/* Historical/Future separator */}
+        <line
+          x1={xSeparator}
+          x2={xSeparator}
+          y1={padT}
+          y2={height - padB}
+          stroke="#d1d5db"
+          strokeWidth={1}
+          strokeDasharray="3 3"
+        />
+
+        {/* Regression line */}
+        {regLinePoints && (
+          <polyline points={regLinePoints} fill="none" stroke={color} strokeWidth={2.2} strokeLinejoin="round" />
+        )}
+
+        {/* Time series (Holt) line */}
+        {holtLinePoints && (
+          <polyline
+            points={holtLinePoints}
+            fill="none"
+            stroke="#16a34a"
+            strokeWidth={2.2}
+            strokeLinejoin="round"
+            strokeDasharray="5 4"
+            opacity={0.95}
+          />
+        )}
+
+        {/* Actual points */}
+        {hist.map((p) => (
+          <circle key={`a-${p.year}`} cx={xForYear(p.year)} cy={yForValue(p.value)} r={3} fill={color} />
+        ))}
+
+        {/* Regression forecast points */}
+        {regression.forecast.map((p) => (
+          <circle
+            key={`r-${p.year}`}
+            cx={xForYear(p.year)}
+            cy={yForValue(p.value)}
+            r={3}
+            fill="white"
+            stroke={color}
+            strokeWidth={2}
+            opacity={0.95}
+          />
+        ))}
+
+        {/* Time-series forecast points */}
+        {holt?.forecast.map((p) => (
+          <rect
+            key={`t-${p.year}`}
+            x={xForYear(p.year) - 3}
+            y={yForValue(p.value) - 3}
+            width={6}
+            height={6}
+            fill="white"
+            stroke="#16a34a"
+            strokeWidth={2}
+            opacity={0.95}
+          />
+        ))}
+
+        {/* X labels */}
+        {xTicks.map((yr, idx) => (
+          <text
+            key={`x-${yr}-${idx}`}
+            x={xForYear(yr)}
+            y={height + labelH - 4}
+            textAnchor={yr === startYear ? 'start' : yr === xEndYear ? 'end' : 'middle'}
+            className="fill-neutral-400 text-[10px]"
+          >
+            {yr}
+          </text>
+        ))}
+      </svg>
+
+      <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-neutral-500">
+        <span className="inline-flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full" style={{ backgroundColor: color }} />
+          Actual
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <span className="h-[2px] w-5 rounded" style={{ backgroundColor: color }} />
+          Regression
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <span className="h-[2px] w-5 rounded border-t-2 border-dashed" style={{ borderColor: '#16a34a' }} />
+          Time-series (Holt)
+        </span>
+      </div>
+    </div>
+  );
+}
+
 function buildContextString(detail: CrisisDetail, year: number): string {
   const lines = [
     `Country: ${detail.country} (${detail.region})`,
@@ -95,6 +443,26 @@ function buildContextString(detail: CrisisDetail, year: number): string {
 export function CrisisDetailPanel({ iso3, year, onClose, onAskAI }: CrisisDetailPanelProps) {
   const [detail, setDetail] = useState<CrisisDetail | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const projections = useMemo(() => {
+    if (!detail) return null;
+
+    const histInNeed: SeriesPoint[] = (detail.trends || [])
+      .map((t) => ({ year: t.year, value: t.inNeed }))
+      .filter((p) => Number.isFinite(p.value));
+
+    const histUsdPerPerson: SeriesPoint[] = (detail.trends || [])
+      .map((t) => ({ year: t.year, value: t.usdPerPerson }))
+      .filter((p) => Number.isFinite(p.value));
+
+    const END_YEAR = 2030;
+
+    return {
+      endYear: END_YEAR,
+      inNeed: histInNeed,
+      usdPerPerson: histUsdPerPerson,
+    };
+  }, [detail]);
 
   useEffect(() => {
     if (!iso3) {
@@ -134,14 +502,14 @@ export function CrisisDetailPanel({ iso3, year, onClose, onAskAI }: CrisisDetail
       </div>
 
       {/* Content */}
-      <div className="p-5">
+      <div className="p-4">
         {loading && <p className="py-8 text-center text-sm text-neutral-400">Loading...</p>}
 
         {detail && !loading && (
-          <div className="space-y-6">
+          <div className="space-y-5">
             {/* Key Metrics */}
             <section>
-              <h3 className="mb-3 text-xs font-medium uppercase tracking-wide text-neutral-400">
+              <h3 className="mb-2 text-xs font-medium uppercase tracking-wide text-neutral-400">
                 Key Metrics ({year})
               </h3>
               <div className="grid grid-cols-2 gap-3">
@@ -184,10 +552,45 @@ export function CrisisDetailPanel({ iso3, year, onClose, onAskAI }: CrisisDetail
               </div>
             </section>
 
+            {/* Future Projections */}
+            {projections && (projections.inNeed.length >= 1 || projections.usdPerPerson.length >= 1) && (
+              <section>
+                <h3 className="mb-2 text-xs font-medium uppercase tracking-wide text-neutral-400">
+                  Future Projections
+                </h3>
+                <div className="space-y-2">
+                  {projections.inNeed.length >= 1 && (
+                    <ForecastScatterPlot
+                      title="People in Need"
+                      endYear={projections.endYear}
+                      historical={projections.inNeed}
+                      formatValue={(v) => formatNumber(Math.round(v))}
+                      color="#dc2626"
+                      clamp={{ min: 0 }}
+                    />
+                  )}
+
+                  {projections.usdPerPerson.length >= 1 && (
+                    <ForecastScatterPlot
+                      title="USD per Person in Need"
+                      endYear={projections.endYear}
+                      historical={projections.usdPerPerson}
+                      formatValue={(v) => `$${Math.max(0, Math.round(v)).toLocaleString()}`}
+                      color="#2563eb"
+                      clamp={{ min: 0 }}
+                    />
+                  )}
+                </div>
+                <p className="mt-2 text-xs text-neutral-400">
+                  Forecasts use 2024–2026 values with regression and Holt time-series trend.
+                </p>
+              </section>
+            )}
+
             {/* INFORM Severity */}
             {detail.severity && (
               <section>
-                <h3 className="mb-3 text-xs font-medium uppercase tracking-wide text-neutral-400">
+                <h3 className="mb-2 text-xs font-medium uppercase tracking-wide text-neutral-400">
                   Crisis Severity
                 </h3>
                 <div className="rounded border border-neutral-100 p-4">
@@ -214,7 +617,7 @@ export function CrisisDetailPanel({ iso3, year, onClose, onAskAI }: CrisisDetail
             {/* Sector Gaps */}
             {detail.sectorGaps.length > 0 && (
               <section>
-                <h3 className="mb-3 text-xs font-medium uppercase tracking-wide text-neutral-400">
+                <h3 className="mb-2 text-xs font-medium uppercase tracking-wide text-neutral-400">
                   Sector Coverage
                 </h3>
                 <div className="space-y-2">
@@ -243,7 +646,7 @@ export function CrisisDetailPanel({ iso3, year, onClose, onAskAI }: CrisisDetail
             {/* Timeline */}
             {detail.timeline && (
               <section>
-                <h3 className="mb-3 text-xs font-medium uppercase tracking-wide text-neutral-400">
+                <h3 className="mb-2 text-xs font-medium uppercase tracking-wide text-neutral-400">
                   Timeline
                 </h3>
                 <div className="rounded border border-neutral-100 p-4 text-sm">

@@ -29,6 +29,8 @@ const ALLOWED_PATHS = [
   'data/geo_mismatch/hpc_hno_2025.csv',
   'data/geo_mismatch/hpc_hno_2026.csv',
   'data/geo_mismatch/humanitarian-response-plans.csv',
+  'data/geo_mismatch/fts_country_monthly_funding.csv',
+  'data/geo_mismatch/fts_plan_monthly_funding.csv',
   
   // Population Data (COD)
   'data/geo_mismatch/cod_population_admin0.csv',

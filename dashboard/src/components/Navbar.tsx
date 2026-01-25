@@ -15,6 +15,8 @@ const DATASETS = [
   { id: 'hpc_hno_2025', label: 'HPC HNO 2025', path: 'data/geo_mismatch/hpc_hno_2025.csv' },
   { id: 'hpc_hno_2026', label: 'HPC HNO 2026', path: 'data/geo_mismatch/hpc_hno_2026.csv' },
   { id: 'hrp', label: 'Humanitarian Response Plans', path: 'data/geo_mismatch/humanitarian-response-plans.csv' },
+  { id: 'fts_country_monthly', label: 'FTS Country Monthly Funding ⭐', path: 'data/geo_mismatch/fts_country_monthly_funding.csv' },
+  { id: 'fts_plan_monthly', label: 'FTS Plan Monthly Funding', path: 'data/geo_mismatch/fts_plan_monthly_funding.csv' },
   
   // === Population Data (COD) ===
   { id: 'cod_pop_admin0', label: 'Population (Country Level)', path: 'data/geo_mismatch/cod_population_admin0.csv' },
