@@ -1,8 +1,4 @@
 import { NextResponse } from 'next/server';
-<<<<<<< HEAD
-import { promises as fs } from 'fs';
-import path from 'path';
-=======
 import { supabase } from '@/lib/supabase';
 
 // Parse a CSV line handling quoted values
@@ -35,7 +31,6 @@ const ALLOWED_PATHS = [
   'data/geo_mismatch/cod_population_admin0.csv',
   'data/geo_mismatch/inform_severity_master_2020_2025.csv',
 ];
->>>>>>> 5d9ae2cfa8499c593acb31f470c87a6a6fe6fdb5
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -45,14 +40,6 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Missing path parameter' }, { status: 400 });
   }
 
-<<<<<<< HEAD
-  try {
-    const fullPath = path.join(process.cwd(), '..', datasetPath);
-    const content = await fs.readFile(fullPath, 'utf-8');
-    
-    // Parse CSV
-    const lines = content.split('\n').filter(line => line.trim());
-=======
   // Security: Validate the path is allowed
   if (!ALLOWED_PATHS.includes(datasetPath)) {
     return NextResponse.json({ error: 'Invalid dataset path' }, { status: 400 });
@@ -76,7 +63,6 @@ export async function GET(request: Request) {
     const content = await data.text();
     const lines = content.split('\n').filter(line => line.trim());
     
->>>>>>> 5d9ae2cfa8499c593acb31f470c87a6a6fe6fdb5
     if (lines.length === 0) {
       return NextResponse.json({ headers: [], rows: [], totalRows: 0 });
     }
@@ -109,26 +95,3 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Failed to load dataset' }, { status: 500 });
   }
 }
-<<<<<<< HEAD
-
-function parseCSVLine(line: string): string[] {
-  const values: string[] = [];
-  let current = '';
-  let inQuotes = false;
-
-  for (let i = 0; i < line.length; i++) {
-    const char = line[i];
-    if (char === '"') {
-      inQuotes = !inQuotes;
-    } else if (char === ',' && !inQuotes) {
-      values.push(current.trim());
-      current = '';
-    } else {
-      current += char;
-    }
-  }
-  values.push(current.trim());
-  return values;
-}
-=======
->>>>>>> 5d9ae2cfa8499c593acb31f470c87a6a6fe6fdb5
