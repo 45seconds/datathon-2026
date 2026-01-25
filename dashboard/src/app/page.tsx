@@ -53,7 +53,11 @@ export default function Home() {
   // Listen for country selection from map popup button
   useEffect(() => {
     const handleSelectCountry = (e: CustomEvent<string>) => {
-      setSelectedCountry(e.detail);
+      const iso3 = e.detail;
+      setSelectedCountry(iso3);
+      // Also zoom to the country when clicked on the map
+      setZoomToCountry(iso3);
+      setTimeout(() => setZoomToCountry(null), 2000);
     };
     window.addEventListener('selectCountry', handleSelectCountry as EventListener);
     return () => window.removeEventListener('selectCountry', handleSelectCountry as EventListener);
