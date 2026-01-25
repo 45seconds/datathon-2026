@@ -593,7 +593,11 @@ export default function AIChatSidebar({ isOpen, onClose, countryFocus, onClearCo
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 ? (
           <div className="text-center py-8">
-            <div className="text-4xl mb-4">💡</div>
+            <img 
+              src="/un_logo.svg.png" 
+              alt="United Nations" 
+              className="h-16 w-auto mx-auto mb-4"
+            />
             <h3 className="font-medium text-neutral-900 mb-2">Ask about humanitarian crises</h3>
             <p className="text-sm text-neutral-500 mb-6">
               I can help you explore crisis data, funding gaps, and regional needs.

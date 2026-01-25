@@ -34,6 +34,40 @@ function formatCurrency(num: number): string {
   return `$${formatNumber(num)}`;
 }
 
+function formatDriver(driver: string): string {
+  if (!driver || driver.trim() === '') return 'Unknown';
+  
+  // Split by comma first, then process each part
+  const parts = driver.split(',').map(p => p.trim()).filter(Boolean);
+  
+  const formattedParts = parts.map(part => {
+    // Add spaces around "/" if missing
+    let formatted = part.replace(/\/(?=\S)/g, ' / ').replace(/(?<=\S)\//g, ' / ');
+    
+    // Capitalize words (title case)
+    formatted = formatted
+      .toLowerCase()
+      .split(' ')
+      .map(word => {
+        // Handle special cases like "and", "or", "of" - keep lowercase unless first word
+        const smallWords = ['and', 'or', 'of', 'the', 'a', 'an'];
+        if (smallWords.includes(word)) return word;
+        return word.charAt(0).toUpperCase() + word.slice(1);
+      })
+      .join(' ');
+    
+    // Capitalize first letter of the whole part
+    if (formatted.length > 0) {
+      formatted = formatted.charAt(0).toUpperCase() + formatted.slice(1);
+    }
+    
+    return formatted;
+  });
+  
+  // Join with proper comma spacing
+  return formattedParts.join(', ');
+}
+
 function buildContextString(detail: CrisisDetail, year: number): string {
   const lines = [
     `Country: ${detail.country} (${detail.region})`,
@@ -47,7 +81,7 @@ function buildContextString(detail: CrisisDetail, year: number): string {
   if (detail.severity) {
     lines.push(`Severity Index: ${detail.severity.severityIndex.toFixed(1)}/5.0`);
     lines.push(`Crisis Type: ${detail.severity.crisisType}`);
-    lines.push(`Primary Driver: ${detail.severity.primaryDriver}`);
+    lines.push(`Primary Driver: ${formatDriver(detail.severity.primaryDriver)}`);
   }
 
   if (detail.timeline) {
@@ -170,7 +204,7 @@ export function CrisisDetailPanel({ iso3, year, onClose, onAskAI }: CrisisDetail
                     </div>
                     <div>
                       <span className="text-neutral-500">Driver</span>
-                      <p className="text-neutral-900">{detail.severity.primaryDriver}</p>
+                      <p className="text-neutral-900">{formatDriver(detail.severity.primaryDriver)}</p>
                     </div>
                   </div>
                 </div>
