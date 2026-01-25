@@ -33,7 +33,7 @@ export function AnimatedCounter({
       const percentage = Math.min(progress / duration, 1);
       
       const easeOutQuart = 1 - Math.pow(1 - percentage, 4);
-      const current = Math.floor(easeOutQuart * end);
+      const current = decimals > 0 ? easeOutQuart * end : Math.floor(easeOutQuart * end);
       
       countRef.current = current;
       setCount(current);
@@ -46,9 +46,9 @@ export function AnimatedCounter({
     };
 
     requestAnimationFrame(animate);
-  }, [end, duration]);
+  }, [end, duration, decimals]);
 
-  const formattedCount = decimals > 0 ? count.toFixed(decimals) : count.toString();
+  const formattedCount = decimals > 0 ? Number(count).toFixed(decimals) : Math.floor(count).toString();
 
   return (
     <span className={className}>

@@ -125,8 +125,8 @@ function calculateSummary(predictions: CountryPrediction[]): PredictionSummary {
     totalPessimisticGap: predictions.reduce((sum, p) => sum + p.pessimistic.gap, 0),
     averageCoverage: predictions.reduce((sum, p) => sum + p.baseline.coverage, 0) / predictions.length,
     totalPeopleAffected: predictions.reduce((sum, p) => sum + p.baseline.inNeed, 0),
-    criticalCountries: predictions.filter(p => p.priorityScore > 0.8).length,
-    highPriorityCountries: predictions.filter(p => p.priorityScore > 0.6 && p.priorityScore <= 0.8).length,
+    criticalCountries: predictions.filter(p => p.priorityScore > 0.7).length,
+    highPriorityCountries: predictions.filter(p => p.priorityScore > 0.5 && p.priorityScore <= 0.7).length,
     modelAccuracy: 0.877, // From notebook model evaluation
     modelR2Score: 0.8567  // From notebook model evaluation
   };

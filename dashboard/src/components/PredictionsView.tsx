@@ -140,7 +140,7 @@ export function PredictionsView() {
               <p className="mt-1 text-xs text-neutral-400">
                 <AnimatedCounter 
                   end={summary.averageCoverage * 100} 
-                  decimals={0}
+                  decimals={2}
                   suffix="% avg coverage"
                   duration={2000}
                 />
@@ -155,7 +155,7 @@ export function PredictionsView() {
                   duration={2000}
                 />
               </p>
-              <p className="mt-1 text-xs text-neutral-400">Priority score &gt; 0.8</p>
+              <p className="mt-1 text-xs text-neutral-400">Priority score &gt; 0.7</p>
             </div>
             <div className="px-6 py-8">
               <p className="text-sm text-neutral-500">Scenario Range</p>
