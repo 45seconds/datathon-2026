@@ -44,9 +44,16 @@ interface ChatMessage {
   timestamp: Date;
 }
 
+interface CountryContext {
+  countryName: string;
+  context: string;
+}
+
 interface AIChatSidebarProps {
   isOpen: boolean;
   onClose: () => void;
+  countryFocus?: CountryContext | null;
+  onClearCountryFocus?: () => void;
 }
 
 // Source citation dropdown component
@@ -384,7 +391,7 @@ const EXAMPLE_QUESTIONS = [
   "How should we plan for future crises in East Africa?", // Predictive
 ];
 
-export default function AIChatSidebar({ isOpen, onClose }: AIChatSidebarProps) {
+export default function AIChatSidebar({ isOpen, onClose, countryFocus, onClearCountryFocus }: AIChatSidebarProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -392,6 +399,7 @@ export default function AIChatSidebar({ isOpen, onClose }: AIChatSidebarProps) {
   const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [activeCountryTag, setActiveCountryTag] = useState<string | null>(null);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -405,18 +413,42 @@ export default function AIChatSidebar({ isOpen, onClose }: AIChatSidebarProps) {
     }
   }, [isOpen]);
 
+  // Set country tag when country focus changes
+  useEffect(() => {
+    if (countryFocus) {
+      setActiveCountryTag(countryFocus.countryName);
+      // Focus the input after a short delay to allow render
+      setTimeout(() => inputRef.current?.focus(), 100);
+    }
+  }, [countryFocus]);
+
   const sendMessage = async (messageText?: string) => {
     const text = messageText || input.trim();
     if (!text || isLoading) return;
 
+    // Build the full message with country context if present
+    let fullMessage = text;
+    let displayMessage = text;
+    
+    if (activeCountryTag && countryFocus) {
+      // Prepend country context to the message for the API
+      fullMessage = `[Context about ${activeCountryTag}:\n${countryFocus.context}]\n\nUser question about ${activeCountryTag}: ${text}`;
+      displayMessage = `[${activeCountryTag}] ${text}`;
+    }
+
     setInput('');
     setError(null);
+    
+    // Clear the country tag after sending (keep it for one message)
+    const usedCountryTag = activeCountryTag;
+    setActiveCountryTag(null);
+    if (onClearCountryFocus) onClearCountryFocus();
 
-    // Add user message
+    // Add user message (display version)
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
       role: 'user',
-      content: text,
+      content: displayMessage,
       timestamp: new Date(),
     };
     setMessages(prev => [...prev, userMessage]);
@@ -428,11 +460,12 @@ export default function AIChatSidebar({ isOpen, onClose }: AIChatSidebarProps) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: text,
+          message: fullMessage,
           history: messages.slice(-4).map(m => ({
             role: m.role,
             content: m.content,
           })),
+          countryContext: usedCountryTag ? countryFocus?.context : undefined,
         }),
       });
 
@@ -657,15 +690,42 @@ export default function AIChatSidebar({ isOpen, onClose }: AIChatSidebarProps) {
       {/* Input area */}
       <form onSubmit={handleSubmit} className="border-t border-neutral-200 p-4">
         <div className="flex gap-2">
-          <input
-            ref={inputRef}
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask about crisis data..."
-            disabled={isLoading}
-            className="flex-1 rounded-lg border border-neutral-200 px-3 py-2 text-sm focus:border-neutral-400 focus:outline-none focus:ring-1 focus:ring-neutral-400 disabled:bg-neutral-50 disabled:text-neutral-400"
-          />
+          <div className="relative flex-1">
+            {/* Country tag overlay */}
+            {activeCountryTag && (
+              <div className="absolute left-2 top-1/2 -translate-y-1/2 z-10 flex items-center">
+                <span className="inline-flex items-center gap-1 rounded-md bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">
+                  {activeCountryTag}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveCountryTag(null);
+                      if (onClearCountryFocus) onClearCountryFocus();
+                    }}
+                    className="ml-0.5 text-amber-500 hover:text-amber-700"
+                  >
+                    <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </span>
+              </div>
+            )}
+            <input
+              ref={inputRef}
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder={activeCountryTag ? `Ask about ${activeCountryTag}...` : "Ask about crisis data..."}
+              disabled={isLoading}
+              className={`w-full rounded-lg border border-neutral-200 py-2 text-sm focus:border-neutral-400 focus:outline-none focus:ring-1 focus:ring-neutral-400 disabled:bg-neutral-50 disabled:text-neutral-400 ${
+                activeCountryTag ? 'pl-[calc(0.75rem+var(--tag-width,80px))]' : 'px-3'
+              }`}
+              style={{
+                paddingLeft: activeCountryTag ? `${activeCountryTag.length * 7 + 48}px` : undefined,
+              }}
+            />
+          </div>
           <button
             type="submit"
             disabled={!input.trim() || isLoading}
@@ -676,9 +736,6 @@ export default function AIChatSidebar({ isOpen, onClose }: AIChatSidebarProps) {
             </svg>
           </button>
         </div>
-        <p className="mt-2 text-xs text-neutral-400 text-center">
-          Powered by Cerebras • Data from HPC, INFORM, OCHA
-        </p>
       </form>
     </div>
   );
