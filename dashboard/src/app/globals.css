@@ -1,9 +1,30 @@
 @import 'tailwindcss';
 @import 'leaflet/dist/leaflet.css';
 
+<<<<<<< HEAD
 :root {
   --background: #ffffff;
   --foreground: #09090b;
+=======
+/* ============================================
+   THEME: Cursor-inspired minimal palette
+   
+   Colors (3 main + 1 accent):
+   - Background: #ffffff (white)
+   - Text Primary: #171717 (near-black)
+   - Text Secondary: #737373 (neutral gray)
+   - Border: #e5e5e5 (light gray)
+   - Accent: #0066ff (blue - used sparingly)
+   ============================================ */
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --muted: #737373;
+  --border: #e5e5e5;
+  --accent: #0066ff;
+  --surface: #fafafa;
+>>>>>>> 5d9ae2cfa8499c593acb31f470c87a6a6fe6fdb5
 }
 
 @theme inline {
@@ -12,6 +33,7 @@
   --font-sans: var(--font-inter);
 }
 
+<<<<<<< HEAD
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #09090b;
@@ -32,6 +54,18 @@ html {
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
+=======
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+/* Scrollbar - minimal */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+>>>>>>> 5d9ae2cfa8499c593acb31f470c87a6a6fe6fdb5
 }
 
 ::-webkit-scrollbar-track {
@@ -39,6 +73,7 @@ html {
 }
 
 ::-webkit-scrollbar-thumb {
+<<<<<<< HEAD
   background: #d4d4d8;
   border-radius: 4px;
 }
@@ -71,10 +106,40 @@ html {
 .leaflet-popup-content {
   margin: 16px;
   line-height: 1.5;
+=======
+  background: var(--border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
+/* ============================================
+   LEAFLET MAP
+   ============================================ */
+
+.leaflet-container {
+  font-family: inherit;
+  background: var(--surface);
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--border);
+}
+
+.leaflet-popup-content {
+  margin: 12px 16px;
+  line-height: 1.5;
+  font-size: 13px;
+>>>>>>> 5d9ae2cfa8499c593acb31f470c87a6a6fe6fdb5
 }
 
 .leaflet-popup-tip {
   background: white;
+<<<<<<< HEAD
   border: 1px solid #e4e4e7;
   box-shadow: none;
 }
@@ -239,4 +304,136 @@ html {
   .ipynb-wrapper .markdown-cell code {
     background: #27272a !important;
   }
+=======
+  border: 1px solid var(--border);
+  box-shadow: none;
+}
+
+/* ============================================
+   NOTEBOOK VIEWER
+   ============================================ */
+
+.notebook-viewer {
+  @apply bg-white min-h-screen;
+}
+
+.notebook-content {
+  @apply max-w-4xl mx-auto px-6 py-8;
+}
+
+/* Code cells */
+.notebook-content .cell {
+  @apply mb-4;
+}
+
+.notebook-content .cell-input {
+  @apply bg-neutral-50 border border-neutral-200 rounded-md overflow-hidden;
+}
+
+.notebook-content .cell-input pre {
+  @apply p-3 m-0 text-xs leading-relaxed font-mono bg-neutral-50 text-neutral-800;
+}
+
+/* Output cells */
+.notebook-content .cell-output {
+  @apply py-2 mt-0;
+}
+
+.notebook-content .cell-output pre {
+  @apply text-xs leading-relaxed font-mono text-neutral-700 m-0 whitespace-pre-wrap break-words;
+}
+
+/* Graphs and images - smaller */
+.notebook-content .cell-output img {
+  @apply max-w-[85%] h-auto block mx-auto my-4;
+}
+
+/* Tables */
+.notebook-content table {
+  @apply border-collapse text-xs my-3 w-auto;
+}
+
+.notebook-content th,
+.notebook-content td {
+  @apply border border-neutral-200 px-3 py-2 text-left;
+}
+
+.notebook-content th {
+  @apply bg-neutral-50 font-medium text-neutral-700;
+}
+
+.notebook-content tr:nth-child(even) td {
+  @apply bg-neutral-50/50;
+}
+
+/* Markdown */
+.notebook-content [class*="markdown"] {
+  @apply py-2 bg-transparent;
+}
+
+.notebook-content [class*="markdown"] h1 {
+  @apply text-2xl font-semibold mt-8 mb-4 pb-2 border-b border-neutral-200 text-neutral-900;
+}
+
+.notebook-content [class*="markdown"] h2 {
+  @apply text-xl font-semibold mt-6 mb-3 text-neutral-900;
+}
+
+.notebook-content [class*="markdown"] h3 {
+  @apply text-lg font-medium mt-5 mb-2 text-neutral-800;
+}
+
+.notebook-content [class*="markdown"] p {
+  @apply mb-3 leading-relaxed text-neutral-600 text-sm;
+}
+
+.notebook-content [class*="markdown"] ul,
+.notebook-content [class*="markdown"] ol {
+  @apply mb-3 pl-5;
+}
+
+.notebook-content [class*="markdown"] li {
+  @apply mb-1 leading-relaxed text-neutral-600 text-sm;
+}
+
+.notebook-content [class*="markdown"] code {
+  @apply bg-neutral-100 px-1.5 py-0.5 rounded text-xs font-mono text-neutral-700;
+}
+
+.notebook-content [class*="markdown"] strong {
+  @apply font-semibold text-neutral-800;
+}
+
+.notebook-content [class*="markdown"] hr {
+  @apply border-0 border-t border-neutral-200 my-6;
+}
+
+.notebook-content [class*="markdown"] table {
+  @apply w-full my-4;
+}
+
+.notebook-content [class*="markdown"] th {
+  @apply bg-neutral-50 text-neutral-700;
+}
+
+/* Hide code mode */
+.hide-code-inputs .cell-input {
+  @apply hidden;
+}
+
+.hide-code-inputs .cell {
+  @apply mb-3;
+}
+
+.hide-code-inputs .cell-output {
+  @apply p-0;
+}
+
+.hide-code-inputs .cell-output img {
+  @apply my-6 rounded shadow-sm max-w-[80%];
+}
+
+.hide-code-inputs .cell-output pre {
+  @apply bg-neutral-50 p-3 rounded mb-3 border border-neutral-100;
+>>>>>>> 5d9ae2cfa8499c593acb31f470c87a6a6fe6fdb5
 }

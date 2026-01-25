@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+<<<<<<< HEAD
 import {
   getCountryCrisisMetrics,
   getDashboardSummary,
@@ -6,6 +7,18 @@ import {
   getClusterMetrics,
   getTopForgottenCrises,
 } from '@/lib/data';
+=======
+import * as supabaseData from '@/lib/data-supabase';
+import * as csvData from '@/lib/data';
+
+// Check if Supabase is configured
+const isSupabaseConfigured = () => {
+  return !!(process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL);
+};
+
+// Use Supabase if configured, otherwise fallback to CSV
+const dataSource = isSupabaseConfigured() ? supabaseData : csvData;
+>>>>>>> 5d9ae2cfa8499c593acb31f470c87a6a6fe6fdb5
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -15,6 +28,7 @@ export async function GET(request: Request) {
   try {
     switch (type) {
       case 'summary':
+<<<<<<< HEAD
         const summary = await getDashboardSummary(year);
         return NextResponse.json(summary);
 
@@ -32,6 +46,25 @@ export async function GET(request: Request) {
 
       case 'forgotten':
         const forgotten = await getTopForgottenCrises(year);
+=======
+        const summary = await dataSource.getDashboardSummary(year);
+        return NextResponse.json(summary);
+
+      case 'countries':
+        const countries = await dataSource.getCountryCrisisMetrics(year);
+        return NextResponse.json(countries);
+
+      case 'trends':
+        const trends = await dataSource.getYearlyTrends();
+        return NextResponse.json(trends);
+
+      case 'clusters':
+        const clusters = await dataSource.getClusterMetrics(year);
+        return NextResponse.json(clusters);
+
+      case 'forgotten':
+        const forgotten = await dataSource.getTopForgottenCrises(year);
+>>>>>>> 5d9ae2cfa8499c593acb31f470c87a6a6fe6fdb5
         return NextResponse.json(forgotten);
 
       default:

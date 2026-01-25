@@ -10,3 +10,11 @@ scripts/clean_inform_data.py
 scripts/merge_notebooks.py
 scripts/analyze_inform_data.py
 analyze_inform_data.py
+
+# Remote env exclusions
+.env
+.env.local
+.env*.local
+dashboard/.env.local
+scripts/__pycache__/
+

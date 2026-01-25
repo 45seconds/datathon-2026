@@ -32,6 +32,10 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env*.example
+
+# data files (served from Supabase in production)
+/public/data
 
 # vercel
 .vercel

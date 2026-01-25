@@ -28,12 +28,24 @@ const Tooltip = dynamic(
   () => import('react-leaflet').then((mod) => mod.Tooltip),
   { ssr: false }
 );
+<<<<<<< HEAD
+=======
+const MapZoomController = dynamic(
+  () => import('./MapZoomController').then((mod) => ({ default: mod.MapZoomController })),
+  { ssr: false }
+);
+>>>>>>> 5d9ae2cfa8499c593acb31f470c87a6a6fe6fdb5
 
 interface CrisisMapProps {
   data: CountryCrisisMetrics[];
   colorBy: 'needRate' | 'coverageRate' | 'usdPerPersonInNeed' | 'mismatch';
   showCities: boolean;
   year: number;
+<<<<<<< HEAD
+=======
+  onCountrySelect?: (iso3: string) => void;
+  zoomToCountry?: string | null;
+>>>>>>> 5d9ae2cfa8499c593acb31f470c87a6a6fe6fdb5
 }
 
 interface CountryProperties {
@@ -88,7 +100,11 @@ function getColor(value: number, metric: string): string {
   return '#7c3aed';
 }
 
+<<<<<<< HEAD
 export function CrisisMap({ data, colorBy, showCities, year }: CrisisMapProps) {
+=======
+export function CrisisMap({ data, colorBy, showCities, year, onCountrySelect, zoomToCountry }: CrisisMapProps) {
+>>>>>>> 5d9ae2cfa8499c593acb31f470c87a6a6fe6fdb5
   const [geoData, setGeoData] = useState<GeoJSONData | null>(null);
   const [mapReady, setMapReady] = useState(false);
 
@@ -137,7 +153,11 @@ export function CrisisMap({ data, colorBy, showCities, year }: CrisisMapProps) {
     if (countryData) {
       const flag = getCountryFlag(iso3);
       layer.bindPopup(`
+<<<<<<< HEAD
         <div style="min-width: 220px; font-family: system-ui, -apple-system, sans-serif;">
+=======
+        <div style="min-width: 240px; font-family: system-ui, -apple-system, sans-serif;">
+>>>>>>> 5d9ae2cfa8499c593acb31f470c87a6a6fe6fdb5
           <div style="font-size: 18px; font-weight: 600; margin-bottom: 4px;">
             ${flag} ${countryData.country}
           </div>
@@ -166,8 +186,26 @@ export function CrisisMap({ data, colorBy, showCities, year }: CrisisMapProps) {
             </div>
             ` : ''}
           </div>
+<<<<<<< HEAD
         </div>
       `);
+=======
+          <button 
+            onclick="window.dispatchEvent(new CustomEvent('selectCountry', {detail: '${iso3}'}))"
+            style="margin-top: 16px; width: 100%; padding: 8px 16px; background: #3b82f6; color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer;"
+          >
+            View Full Details
+          </button>
+        </div>
+      `);
+      
+      // Add click handler for the country
+      layer.on('click', () => {
+        if (onCountrySelect) {
+          // Close popup after a short delay to let user see the button
+        }
+      });
+>>>>>>> 5d9ae2cfa8499c593acb31f470c87a6a6fe6fdb5
     }
   };
 
@@ -190,6 +228,10 @@ export function CrisisMap({ data, colorBy, showCities, year }: CrisisMapProps) {
         scrollWheelZoom={true}
         className="z-0"
       >
+<<<<<<< HEAD
+=======
+        <MapZoomController zoomToCountry={zoomToCountry || null} geoData={geoData} />
+>>>>>>> 5d9ae2cfa8499c593acb31f470c87a6a6fe6fdb5
         {/* English labels base map from CartoDB */}
         <TileLayer
           attribution='&copy; <a href="https://carto.com/">CARTO</a>'
