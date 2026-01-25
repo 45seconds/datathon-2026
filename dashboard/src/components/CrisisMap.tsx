@@ -28,6 +28,10 @@ const Tooltip = dynamic(
   () => import('react-leaflet').then((mod) => mod.Tooltip),
   { ssr: false }
 );
+const MapZoomController = dynamic(
+  () => import('./MapZoomController').then((mod) => ({ default: mod.MapZoomController })),
+  { ssr: false }
+);
 
 interface CrisisMapProps {
   data: CountryCrisisMetrics[];
@@ -35,6 +39,7 @@ interface CrisisMapProps {
   showCities: boolean;
   year: number;
   onCountrySelect?: (iso3: string) => void;
+  zoomToCountry?: string | null;
 }
 
 interface CountryProperties {
@@ -89,7 +94,7 @@ function getColor(value: number, metric: string): string {
   return '#7c3aed';
 }
 
-export function CrisisMap({ data, colorBy, showCities, year, onCountrySelect }: CrisisMapProps) {
+export function CrisisMap({ data, colorBy, showCities, year, onCountrySelect, zoomToCountry }: CrisisMapProps) {
   const [geoData, setGeoData] = useState<GeoJSONData | null>(null);
   const [mapReady, setMapReady] = useState(false);
 
@@ -204,6 +209,7 @@ export function CrisisMap({ data, colorBy, showCities, year, onCountrySelect }: 
         scrollWheelZoom={true}
         className="z-0"
       >
+        <MapZoomController zoomToCountry={zoomToCountry || null} geoData={geoData} />
         {/* English labels base map from CartoDB */}
         <TileLayer
           attribution='&copy; <a href="https://carto.com/">CARTO</a>'

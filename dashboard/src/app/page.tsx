@@ -34,6 +34,7 @@ export default function Home() {
   const [mapYear, setMapYear] = useState(2026);
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [showQA, setShowQA] = useState(false);
+  const [zoomToCountry, setZoomToCountry] = useState<string | null>(null);
 
   // Listen for country selection from map popup button
   useEffect(() => {
@@ -88,6 +89,14 @@ export default function Home() {
         .catch(console.error);
     }
   }, [activeTab, mapYear]);
+
+  // Handler for clicking on a country in the table
+  const handleCountryClick = (iso3: string) => {
+    setActiveTab('maps');
+    setZoomToCountry(iso3);
+    // Clear zoom target after animation completes
+    setTimeout(() => setZoomToCountry(null), 2000);
+  };
 
   if (loading) {
     return (
@@ -164,7 +173,11 @@ export default function Home() {
               
               <div className="mt-6 grid gap-4 sm:grid-cols-5">
                 {forgotten.slice(0, 5).map((crisis, index) => (
-                  <div key={crisis.iso3} className="rounded-lg border border-neutral-100 p-4">
+                  <div 
+                    key={crisis.iso3} 
+                    onClick={() => handleCountryClick(crisis.iso3)}
+                    className="cursor-pointer rounded-lg border border-neutral-100 p-4 transition-all hover:border-neutral-300 hover:shadow-md"
+                  >
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-medium text-neutral-400">#{index + 1}</span>
                       <span className="text-lg">{getCountryFlag(crisis.iso3)}</span>
@@ -194,6 +207,7 @@ export default function Home() {
                 data={countries}
                 title="All Countries"
                 description="Complete crisis metrics by country"
+                onCountryClick={handleCountryClick}
               />
             </div>
           </section>
@@ -248,6 +262,7 @@ export default function Home() {
               showCities={showCities}
               year={mapYear}
               onCountrySelect={setSelectedCountry}
+              zoomToCountry={zoomToCountry}
             />
           </div>
 

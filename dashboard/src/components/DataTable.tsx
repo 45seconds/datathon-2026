@@ -5,6 +5,7 @@ interface DataTableProps {
   data: CountryCrisisMetrics[];
   title: string;
   description?: string;
+  onCountryClick?: (iso3: string) => void;
 }
 
 function formatNumber(num: number): string {
@@ -24,12 +25,17 @@ function formatCurrency(num: number): string {
   return `$${formatNumber(num)}`;
 }
 
-export function DataTable({ data, title, description }: DataTableProps) {
+export function DataTable({ data, title, description, onCountryClick }: DataTableProps) {
   return (
     <div>
       <div className="mb-4">
         <h2 className="text-lg font-medium text-neutral-900">{title}</h2>
         {description && <p className="mt-1 text-sm text-neutral-500">{description}</p>}
+        {onCountryClick && (
+          <p className="mt-1 text-xs text-neutral-400">
+            💡 Click on any country to view it on the map
+          </p>
+        )}
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
@@ -48,7 +54,8 @@ export function DataTable({ data, title, description }: DataTableProps) {
             {data.map((row, i) => (
               <tr
                 key={row.iso3}
-                className={i < data.length - 1 ? 'border-b border-neutral-100' : ''}
+                onClick={() => onCountryClick?.(row.iso3)}
+                className={`${i < data.length - 1 ? 'border-b border-neutral-100' : ''} ${onCountryClick ? 'cursor-pointer transition-colors hover:bg-neutral-50' : ''}`}
               >
                 <td className="py-3 pr-4">
                   <div className="flex items-center gap-2">
