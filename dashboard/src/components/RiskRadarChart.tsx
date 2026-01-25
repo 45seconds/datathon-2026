@@ -176,22 +176,6 @@ export function RiskRadarChart({ data, country, size = 200 }: RiskRadarChartProp
           );
         })}
       </svg>
-
-      <div className="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-2">
-        {data.map((item, i) => (
-          <div 
-            key={i}
-            className="flex items-center gap-1.5 transition-opacity duration-500"
-            style={{
-              opacity: animated ? 1 : 0,
-              transitionDelay: `${i * 100 + 500}ms`
-            }}
-          >
-            <div className={`h-2 w-2 rounded-full ${item.color}`}></div>
-            <span className="text-xs text-neutral-600">{item.label}</span>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }
