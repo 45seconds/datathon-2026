@@ -1,0 +1,42 @@
+Field,Label,Value
+id,Dataset ID,f0e95437-b6d9-4897-9e3f-84853bcbfaee
+title,Title of Dataset,Humanitarian Response Plans
+name,Dataset URL,humanitarian-response-plans
+notes,Description,"A live list of all past and present <em>Humanitarian Response Plans,</em> with identifiers for use in International Aid Transparency Initiative (IATI) reporting and elsewhere.   The UN and its partners prepare a Humanitarian Response Plan (HRP) plan for a protracted or sudden onset emergency that requires international humanitarian assistance. The plan articulates the shared vision of how to respond to the assessed and expressed needs of the affected population."
+dataset_source,Source,HPC Tools
+organization,Contributor,OCHA Financial Tracking System (FTS)
+dataset_date,Reference Period,[2008-01-01T00:00:00 TO *]
+last_modified,Updated,2026-01-24T08:44:03.942512
+data_update_frequency,Expected Update Frequency,Live
+groups,Location,World
+license_title,License,Public Domain / No restrictions (CC0)
+methodology,Methodology,Registry
+methodology_other,Define Methodology,
+caveats,Caveats/Comments,"All currency amounts are in USD. The JSON resource contains complete information, while the CSV resource is a simplified version for convenient spreadsheet use."
+tags,Tags,"humanitarian response plan-hrp, hxl"
+resource_1_created,Created,2018-12-04T15:27:26.011816
+resource_1_description,Description,"HXL-hashtagged CSV list of Humanitarian Response Plans dating back to 1999, with HXL hashtags, converted live from the JSON API output."
+resource_1_format,File Format,CSV
+resource_1_download_url,Download URL,https://proxy.hxlstandard.org/data/download/humanitarian-response-plans.csv?filter01=cut&filter-label01=Remove+columns+without+hashtags.&cut-skip-untagged01=on&filter02=add&filter-label02=Add+endDate+column+to+front%2C+copying+JSON.&add-tag02=date%2Bend&add-value02={{%23response%2Bname}}&add-header02=endDate&add-before02=on&filter03=add&filter-label03=Add+startDate+column+to+front%2C+copying+JSON.&add-tag03=%23date%2Bstart&add-value03={{%23response%2Bname}}&add-header03=startDate&add-before03=on&filter04=add&filter-label04=Add+internalId+to+front%2C+copying+JSON.&add-tag04=%23meta%2Bid&add-value04={{%23response%2Bname}}&add-header04=internalId&add-before04=on&filter05=add&filter-label05=Add+code+column+to+front%2C+copying+JSON.&add-tag05=%23response%2Bcode&add-value05={{%23response%2Bname}}&add-header05=code&add-before05=on&filter06=jsonpath&filter-label06=Extract+code+value+from+JSON.&jsonpath-path06=%24.code&jsonpath-patterns06=%23response%2Bcode&filter07=jsonpath&filter-label07=Extract+internalId+value+from+JSON.&jsonpath-path07=%24.id&jsonpath-patterns07=meta%2Bid&filter08=jsonpath&filter-label08=Extract+startDate+value+from+JSON.&jsonpath-path08=%24.startDate&jsonpath-patterns08=date%2Bstart&filter09=jsonpath&filter-label09=Extract+years+values+from+JSON+and+flatten+list.&jsonpath-path09=%24[*].year&jsonpath-patterns09=date%2Byear&jsonpath-flatten09=on&filter10=jsonpath&filter-label10=Extract+endDate+value+from+JSON.&jsonpath-path10=%24.endDate&jsonpath-patterns10=%23date%2Bend&filter11=jsonpath&filter-label11=Extract+categories+values+from+JSON+and+flatten+list.&jsonpath-path11=%24[*].name&jsonpath-patterns11=%23response%2Btype&jsonpath-flatten11=on&filter12=jsonpath&filter-label12=Extract+locations+ISO3+codes+from+JSON+and+flatten+list.&jsonpath-path12=%24[*].iso3&jsonpath-patterns12=%23country%2Bcode%2Blist&jsonpath-flatten12=on&filter13=jsonpath&filter-label13=Extract+name+value+from+JSON.&jsonpath-path13=%24.name&jsonpath-patterns13=response%2Bname&filter14=clean&filter-label14=Normalise+dates.&clean-date-tags14=%23date&filter15=sort&filter-label15=Sort+plans+in+reverse+date+order.&sort-tags15=date%2Bstart&sort-reverse15=on&filter16=replace&filter-label16=Replace+list+separator+with+comma+(can+remove+when+libhxl+updated)&replace-pattern16=([A-Z])\\s%2B\\|\\s%2B([A-Z])&replace-regex16=on&replace-value16=\\1%2C+\\2&replace-tags16=%23country&filter17=replace&filter-label17=Remove+stray+separators+(can+remove+when+libhxl+updated).&replace-pattern17=\\s*\\|\\s*&replace-regex17=on&replace-tags17=%23*%2Blist&tagger-match-all=on&tagger-05-header=planversion&tagger-05-tag=%23response%2Bname&tagger-06-header=categories&tagger-06-tag=%23response%2Btype%2Blist&tagger-08-header=locations&tagger-08-tag=%23country%2Bcode%2Blist&tagger-09-header=years&tagger-09-tag=%23date%2Byear%2Blist&tagger-10-header=origrequirements&tagger-10-tag=%23value%2Brequirements%2Borig%2Bc_usd&tagger-11-header=revisedrequirements&tagger-11-tag=%23value%2Brequirements%2Brevised%2Bc_usd&tagger-12-header=code&tagger-12-tag=%23response%2Bcode&tagger-13-header=startdate&tagger-13-tag=%23date%2Bstart&tagger-14-header=enddate&tagger-14-tag=%23date%2Bend&header-row=1&url=http%3A%2F%2Fapi.hpc.tools%2Fv2%2Fpublic%2Fplan&name=Humanitarian+Response+Plans
+resource_1_id,Resource ID,d4e67ae7-a910-47c9-b283-304877c7e5eb
+resource_1_last_modified,Updated,2026-01-24T08:44:03.942512
+resource_1_metadata_modified,Metadata Updated,2026-01-24T10:44:56.546947
+resource_1_microdata,Microdata,False
+resource_1_dataset_id,Dataset ID,f0e95437-b6d9-4897-9e3f-84853bcbfaee
+resource_1_resource_type,Resource Type,api
+resource_1_name,Resource Name,Humanitarian Response Plans
+resource_1_mimetype,MIME Type,text/csv
+resource_1_size,Size,124.9K
+resource_2_created,Created,2018-12-04T15:27:27.496172
+resource_2_description,Description,Original JSON API output (live).
+resource_2_format,File Format,JSON
+resource_2_download_url,Download URL,http://api.hpc.tools/v2/public/plan
+resource_2_id,Resource ID,5d238ba7-df31-461f-bf1e-9d1a045d77b1
+resource_2_last_modified,Updated,2026-01-24T08:44:03.942512
+resource_2_metadata_modified,Metadata Updated,2026-01-24T10:44:56.547139
+resource_2_microdata,Microdata,False
+resource_2_dataset_id,Dataset ID,f0e95437-b6d9-4897-9e3f-84853bcbfaee
+resource_2_resource_type,Resource Type,api
+resource_2_name,Resource Name,HPC Tools API output
+resource_2_mimetype,MIME Type,
+resource_2_size,Size,3.8M

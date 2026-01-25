@@ -78,6 +78,8 @@ export interface ClusterMetrics {
   coverageRate: number;
   countryCount: number;
 }
+<<<<<<< HEAD
+=======
 
 export interface CountryClusterGap {
   cluster: string;
@@ -155,3 +157,4 @@ export interface CrisisDetail {
     url?: string;
   }[];
 }
+>>>>>>> 5d9ae2cfa8499c593acb31f470c87a6a6fe6fdb5

@@ -9,7 +9,10 @@
     "lint": "eslint"
   },
   "dependencies": {
+<<<<<<< HEAD
+=======
     "@supabase/supabase-js": "^2.91.1",
+>>>>>>> 5d9ae2cfa8499c593acb31f470c87a6a6fe6fdb5
     "@types/leaflet": "^1.9.21",
     "leaflet": "^1.9.4",
     "next": "16.1.4",

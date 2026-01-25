@@ -1,12 +1,18 @@
 import { NextResponse } from 'next/server';
+<<<<<<< HEAD
+import { promises as fs } from 'fs';
+import path from 'path';
+=======
 import { supabase } from '@/lib/supabase';
 
 // Allowed notebook paths for security
 const ALLOWED_NOTEBOOKS = [
+  'notebooks/DSC_Datathon.ipynb',
   'notebooks/geo_mismatch.ipynb',
   'notebooks/DSC_Datathon_2026_Starter_Notebook.ipynb',
   'notebooks/challenge1_smart_beneficiary_targeting_validation.ipynb',
 ];
+>>>>>>> 5d9ae2cfa8499c593acb31f470c87a6a6fe6fdb5
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -16,6 +22,11 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Missing path parameter' }, { status: 400 });
   }
 
+<<<<<<< HEAD
+  try {
+    const fullPath = path.join(process.cwd(), '..', notebookPath);
+    const content = await fs.readFile(fullPath, 'utf-8');
+=======
   // Security: Validate the path is allowed
   if (!ALLOWED_NOTEBOOKS.includes(notebookPath)) {
     return NextResponse.json({ error: 'Invalid notebook path' }, { status: 400 });
@@ -37,6 +48,7 @@ export async function GET(request: Request) {
 
     // Parse notebook JSON
     const content = await data.text();
+>>>>>>> 5d9ae2cfa8499c593acb31f470c87a6a6fe6fdb5
     const notebook = JSON.parse(content);
     
     return NextResponse.json({ notebook });

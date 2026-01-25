@@ -1,6 +1,11 @@
 @import 'tailwindcss';
 @import 'leaflet/dist/leaflet.css';
 
+<<<<<<< HEAD
+:root {
+  --background: #ffffff;
+  --foreground: #09090b;
+=======
 /* ============================================
    THEME: Cursor-inspired minimal palette
    
@@ -19,6 +24,7 @@
   --border: #e5e5e5;
   --accent: #0066ff;
   --surface: #fafafa;
+>>>>>>> 5d9ae2cfa8499c593acb31f470c87a6a6fe6fdb5
 }
 
 @theme inline {
@@ -27,6 +33,28 @@
   --font-sans: var(--font-inter);
 }
 
+<<<<<<< HEAD
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #09090b;
+    --foreground: #fafafa;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+=======
 body {
   background: var(--background);
   color: var(--foreground);
@@ -37,6 +65,7 @@ body {
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
+>>>>>>> 5d9ae2cfa8499c593acb31f470c87a6a6fe6fdb5
 }
 
 ::-webkit-scrollbar-track {
@@ -44,6 +73,40 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
+<<<<<<< HEAD
+  background: #d4d4d8;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1aa;
+}
+
+@media (prefers-color-scheme: dark) {
+  ::-webkit-scrollbar-thumb {
+    background: #3f3f46;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #52525b;
+  }
+}
+
+/* Leaflet */
+.leaflet-container {
+  font-family: inherit;
+  background: #f4f4f5;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  border: 1px solid #e4e4e7;
+}
+
+.leaflet-popup-content {
+  margin: 16px;
+  line-height: 1.5;
+=======
   background: var(--border);
   border-radius: 3px;
 }
@@ -71,10 +134,177 @@ body {
   margin: 12px 16px;
   line-height: 1.5;
   font-size: 13px;
+>>>>>>> 5d9ae2cfa8499c593acb31f470c87a6a6fe6fdb5
 }
 
 .leaflet-popup-tip {
   background: white;
+<<<<<<< HEAD
+  border: 1px solid #e4e4e7;
+  box-shadow: none;
+}
+
+/* Notebook wrapper - using the library's built-in styles */
+.ipynb-wrapper {
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+/* Override notebook styles for better readability */
+.ipynb-wrapper .ipynb-renderer {
+  background: transparent !important;
+}
+
+.ipynb-wrapper .cell {
+  margin-bottom: 24px !important;
+  border: none !important;
+  border-radius: 0 !important;
+}
+
+.ipynb-wrapper .cell-input {
+  background: #1e1e1e !important;
+  border-radius: 8px !important;
+  overflow: hidden;
+}
+
+.ipynb-wrapper .cell-input pre {
+  padding: 16px !important;
+  margin: 0 !important;
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+  font-family: 'SF Mono', 'Fira Code', Monaco, Consolas, monospace !important;
+}
+
+.ipynb-wrapper .cell-output {
+  margin-top: 12px !important;
+  padding: 16px !important;
+  background: #fafafa !important;
+  border: 1px solid #e4e4e7 !important;
+  border-radius: 8px !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  .ipynb-wrapper .cell-output {
+    background: #18181b !important;
+    border-color: #27272a !important;
+  }
+}
+
+.ipynb-wrapper .cell-output pre {
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+  white-space: pre-wrap !important;
+  word-break: break-word !important;
+}
+
+.ipynb-wrapper .cell-output img {
+  max-width: 100% !important;
+  height: auto !important;
+  display: block !important;
+  margin: 16px auto !important;
+  border-radius: 4px !important;
+}
+
+.ipynb-wrapper table {
+  border-collapse: collapse !important;
+  font-size: 13px !important;
+  margin: 12px 0 !important;
+}
+
+.ipynb-wrapper th,
+.ipynb-wrapper td {
+  border: 1px solid #e4e4e7 !important;
+  padding: 8px 12px !important;
+  text-align: left !important;
+}
+
+.ipynb-wrapper th {
+  background: #f4f4f5 !important;
+  font-weight: 600 !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  .ipynb-wrapper th,
+  .ipynb-wrapper td {
+    border-color: #3f3f46 !important;
+  }
+  .ipynb-wrapper th {
+    background: #27272a !important;
+  }
+}
+
+/* Markdown in notebooks */
+.ipynb-wrapper .markdown-cell {
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+.ipynb-wrapper .markdown-cell h1 {
+  font-size: 2rem !important;
+  font-weight: 700 !important;
+  margin: 32px 0 16px !important;
+  color: #18181b !important;
+}
+
+.ipynb-wrapper .markdown-cell h2 {
+  font-size: 1.5rem !important;
+  font-weight: 600 !important;
+  margin: 28px 0 12px !important;
+  color: #18181b !important;
+}
+
+.ipynb-wrapper .markdown-cell h3 {
+  font-size: 1.25rem !important;
+  font-weight: 600 !important;
+  margin: 24px 0 8px !important;
+  color: #27272a !important;
+}
+
+.ipynb-wrapper .markdown-cell p {
+  margin: 0 0 16px !important;
+  line-height: 1.75 !important;
+  color: #3f3f46 !important;
+}
+
+.ipynb-wrapper .markdown-cell ul,
+.ipynb-wrapper .markdown-cell ol {
+  margin: 0 0 16px !important;
+  padding-left: 28px !important;
+}
+
+.ipynb-wrapper .markdown-cell li {
+  margin-bottom: 8px !important;
+  line-height: 1.7 !important;
+  color: #3f3f46 !important;
+}
+
+.ipynb-wrapper .markdown-cell code {
+  background: #f4f4f5 !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
+  font-size: 0.9em !important;
+  font-family: 'SF Mono', Monaco, monospace !important;
+}
+
+.ipynb-wrapper .markdown-cell strong {
+  font-weight: 600 !important;
+  color: #18181b !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  .ipynb-wrapper .markdown-cell h1,
+  .ipynb-wrapper .markdown-cell h2,
+  .ipynb-wrapper .markdown-cell h3,
+  .ipynb-wrapper .markdown-cell strong {
+    color: #fafafa !important;
+  }
+  .ipynb-wrapper .markdown-cell p,
+  .ipynb-wrapper .markdown-cell li {
+    color: #a1a1aa !important;
+  }
+  .ipynb-wrapper .markdown-cell code {
+    background: #27272a !important;
+  }
+=======
   border: 1px solid var(--border);
   box-shadow: none;
 }
@@ -205,4 +435,5 @@ body {
 
 .hide-code-inputs .cell-output pre {
   @apply bg-neutral-50 p-3 rounded mb-3 border border-neutral-100;
+>>>>>>> 5d9ae2cfa8499c593acb31f470c87a6a6fe6fdb5
 }
