@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Navbar, DataTable, NotebookViewer, CrisisMap, DatasetViewer, CrisisDetailPanel, SidebarQA, AIChatSidebar } from '@/components';
+import { Navbar, DataTable, NotebookViewer, CrisisMap, DatasetViewer, CrisisDetailPanel, AIChatSidebar } from '@/components';
 import { CountryCrisisMetrics, DashboardSummary } from '@/types';
 import { getCountryFlag } from '@/lib/flags';
 import type { Ipynb } from 'react-ipynb-renderer';
@@ -45,7 +45,6 @@ export default function Home() {
   const [mapYear, setMapYear] = useState(2026);
   const [mapLanguage, setMapLanguage] = useState<UNLanguage>('en');
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
-  const [showQA, setShowQA] = useState(false);
   const [zoomToCountry, setZoomToCountry] = useState<string | null>(null);
   const [showAIChat, setShowAIChat] = useState(false);
 
@@ -136,18 +135,6 @@ export default function Home() {
         chatOpen={showAIChat}
       />
 
-      {/* Q&A Toggle Button - minimal style */}
-      <button
-        onClick={() => setShowQA(!showQA)}
-        className="fixed bottom-6 left-6 z-50 flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-4 py-2.5 text-sm text-neutral-700 shadow-sm transition-all hover:bg-neutral-50"
-      >
-        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        {showQA ? 'Close' : 'Ask'}
-      </button>
-
-      <SidebarQA isOpen={showQA} onClose={() => setShowQA(false)} />
       
       {/* AI Chat Sidebar */}
       <AIChatSidebar isOpen={showAIChat} onClose={() => setShowAIChat(false)} />
