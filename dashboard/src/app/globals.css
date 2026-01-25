@@ -33,6 +33,28 @@ body {
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
 }
 
+/* ============================================
+   LOGO DROP-DOWN ANIMATION
+   ============================================ */
+
+@keyframes drop-down {
+  0% {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-swoop-in {
+  animation: drop-down 0.8s ease-out both;
+}
+
 /* Scrollbar - minimal */
 ::-webkit-scrollbar {
   width: 6px;

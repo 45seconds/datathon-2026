@@ -117,9 +117,27 @@ export function Navbar({ activeTab, onTabChange, onToggleChat, chatOpen }: Navba
       <div className="flex items-center gap-6">
         {/* Partner Logos */}
         <div className="flex items-center gap-4 border-r border-neutral-200 pr-6 pl-0">
-          <img src="/cmudatascience_logo.png" alt="CMU Data Science Club" className="h-7 w-auto" title="CMU Data Science Club" />
-          <img src="/databricks_logo.png" alt="Databricks" className="h-6 w-auto" title="Databricks" />
-          <img src="/un_logo.svg.png" alt="United Nations" className="h-7 w-auto" title="United Nations" />
+          <img 
+            src="/cmudatascience_logo.png" 
+            alt="CMU Data Science Club" 
+            className="h-7 w-auto animate-swoop-in" 
+            style={{ animationDelay: '0.2s' }}
+            title="CMU Data Science Club" 
+          />
+          <img 
+            src="/databricks_logo.png" 
+            alt="Databricks" 
+            className="h-6 w-auto animate-swoop-in" 
+            style={{ animationDelay: '0.5s' }}
+            title="Databricks" 
+          />
+          <img 
+            src="/un_logo.svg.png" 
+            alt="United Nations" 
+            className="h-7 w-auto animate-swoop-in" 
+            style={{ animationDelay: '0.8s' }}
+            title="United Nations" 
+          />
         </div>
         
         <span className="text-sm font-medium text-neutral-900">
