@@ -41,7 +41,6 @@ export default function Home() {
 
   // Map state
   const [mapColorBy, setMapColorBy] = useState<'needRate' | 'coverageRate' | 'usdPerPersonInNeed' | 'mismatch'>('needRate');
-  const [showCities, setShowCities] = useState(true);
   const [mapYear, setMapYear] = useState(2026);
   const [mapLanguage, setMapLanguage] = useState<UNLanguage>('en');
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
@@ -274,22 +273,12 @@ export default function Home() {
                 <option value={2026}>2026</option>
               </select>
             </div>
-            <label className="flex items-center gap-1.5 text-xs">
-              <input
-                type="checkbox"
-                checked={showCities}
-                onChange={(e) => setShowCities(e.target.checked)}
-                className="h-3.5 w-3.5 rounded border-neutral-300"
-              />
-              <span className="text-neutral-600">Cities</span>
-            </label>
           </div>
 
           <div className="flex-1">
             <CrisisMap
               data={countries}
               colorBy={mapColorBy}
-              showCities={showCities}
               year={mapYear}
               onCountrySelect={setSelectedCountry}
               onCountryClick={handleMapCountryClick}
