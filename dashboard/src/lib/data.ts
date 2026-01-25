@@ -152,26 +152,13 @@ export async function getCountryCrisisMetrics(
     { inNeed: number; targeted: number; population: number }
   > = {};
 
-  const isTotalCategory = (category: string): boolean => {
-    const c = (category || '').trim().toLowerCase();
-    return c === '' || c === 'total';
-  };
-
-  const isNationalLevel = (row: Record<string, string>): boolean => {
-    const a1 = (row['Admin 1 PCode'] || '').trim();
-    const a2 = (row['Admin 2 PCode'] || '').trim();
-    const a3 = (row['Admin 3 PCode'] || '').trim();
-    return !a1 && !a2 && !a3;
-  };
-
   hnoData.forEach((row) => {
     const iso3 = row['Country ISO3'];
     const cluster = row['Cluster'] || '';
     const category = row['Category'] || '';
 
-    // Use national-level totals only to avoid double counting.
-    // For 2026 HNO, admin columns are absent, so isNationalLevel() still returns true.
-    if (cluster === 'ALL' && isTotalCategory(category) && isNationalLevel(row)) {
+    // Only use overall totals (cluster = ALL and no sub-category breakdown)
+    if (cluster === 'ALL' && !category.includes('-')) {
       const inNeed = parseNumber(row['In Need']);
       const targeted = parseNumber(row['Targeted']);
       const population = parseNumber(row['Population']);
@@ -310,24 +297,6 @@ export async function getClusterMetrics(
   const hnoPath = path.join(DATA_DIR, `hpc_hno_${year}.csv`);
   const hnoData = await parseCSV<Record<string, string>>(hnoPath);
 
-  const isTotalCategory = (category: string): boolean => {
-    const c = (category || '').trim().toLowerCase();
-    return c === '' || c === 'total';
-  };
-
-  const isNationalLevel = (row: Record<string, string>): boolean => {
-    const a1 = (row['Admin 1 PCode'] || '').trim();
-    const a2 = (row['Admin 2 PCode'] || '').trim();
-    const a3 = (row['Admin 3 PCode'] || '').trim();
-    return !a1 && !a2 && !a3;
-  };
-
-  // Deduplicate at (country, cluster) using national totals to avoid double counting
-  const byCountryCluster: Record<
-    string,
-    { iso3: string; cluster: string; description: string; inNeed: number; targeted: number }
-  > = {};
-
   const clusterMap: Record<
     string,
     {
@@ -342,35 +311,13 @@ export async function getClusterMetrics(
     const cluster = row['Cluster'] || '';
     const description = row['Description'] || '';
     const iso3 = row['Country ISO3'] || '';
-    const category = row['Category'] || '';
 
     // Skip overall aggregates
     if (cluster === 'ALL' || !cluster) return;
-    if (!iso3) return;
-    if (!isTotalCategory(category)) return;
-    if (!isNationalLevel(row)) return;
 
     const inNeed = parseNumber(row['In Need']);
     const targeted = parseNumber(row['Targeted']);
 
-    const key = `${iso3}|${cluster}`;
-    if (!byCountryCluster[key]) {
-      byCountryCluster[key] = {
-        iso3,
-        cluster,
-        description: description || cluster,
-        inNeed,
-        targeted,
-      };
-    } else {
-      byCountryCluster[key].inNeed = Math.max(byCountryCluster[key].inNeed, inNeed);
-      byCountryCluster[key].targeted = Math.max(byCountryCluster[key].targeted, targeted);
-    }
-  });
-
-  // Aggregate to cluster totals
-  Object.values(byCountryCluster).forEach((row) => {
-    const { iso3, cluster, description, inNeed, targeted } = row;
     if (!clusterMap[cluster]) {
       clusterMap[cluster] = {
         description: description || cluster,
@@ -379,6 +326,7 @@ export async function getClusterMetrics(
         targeted: 0,
       };
     }
+
     clusterMap[cluster].countries.add(iso3);
     clusterMap[cluster].inNeed += inNeed;
     clusterMap[cluster].targeted += targeted;

@@ -11,6 +11,9 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: 'Humanitarian Crisis Dashboard | DSC Datathon 2026',
   description: 'Analyzing humanitarian need vs resource allocation to identify underserved global crises',
+  icons: {
+    icon: '/globe.svg',
+  },
 };
 
 export default function RootLayout({

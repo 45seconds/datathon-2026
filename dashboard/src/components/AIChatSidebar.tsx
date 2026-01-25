@@ -44,17 +44,9 @@ interface ChatMessage {
   timestamp: Date;
 }
 
-interface CountryFocus {
-  iso3: string;
-  name: string;
-  context: string;
-}
-
 interface AIChatSidebarProps {
   isOpen: boolean;
   onClose: () => void;
-  countryFocus?: CountryFocus | null;
-  onClearCountryFocus?: () => void;
 }
 
 // Source citation dropdown component
@@ -392,22 +384,14 @@ const EXAMPLE_QUESTIONS = [
   "How should we plan for future crises in East Africa?", // Predictive
 ];
 
-export default function AIChatSidebar({ isOpen, onClose, countryFocus, onClearCountryFocus }: AIChatSidebarProps) {
+export default function AIChatSidebar({ isOpen, onClose }: AIChatSidebarProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isPredictiveMode, setIsPredictiveMode] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [activeCountryTag, setActiveCountryTag] = useState<CountryFocus | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  // Set country focus when passed from detail panel
-  useEffect(() => {
-    if (countryFocus) {
-      setActiveCountryTag(countryFocus);
-    }
-  }, [countryFocus]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -425,30 +409,14 @@ export default function AIChatSidebar({ isOpen, onClose, countryFocus, onClearCo
     const text = messageText || input.trim();
     if (!text || isLoading) return;
 
-    // Include country context if active
-    const fullMessage = activeCountryTag 
-      ? `[Context: ${activeCountryTag.name}] ${text}\n\nCountry context:\n${activeCountryTag.context}`
-      : text;
-
-    const displayMessage = activeCountryTag
-      ? `[${activeCountryTag.name}] ${text}`
-      : text;
-
     setInput('');
     setError(null);
-    
-    // Clear country focus after sending
-    const hadCountryFocus = !!activeCountryTag;
-    if (hadCountryFocus) {
-      setActiveCountryTag(null);
-      onClearCountryFocus?.();
-    }
 
     // Add user message
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
       role: 'user',
-      content: displayMessage,
+      content: text,
       timestamp: new Date(),
     };
     setMessages(prev => [...prev, userMessage]);
@@ -460,7 +428,7 @@ export default function AIChatSidebar({ isOpen, onClose, countryFocus, onClearCo
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: fullMessage,
+          message: text,
           history: messages.slice(-4).map(m => ({
             role: m.role,
             content: m.content,
@@ -593,11 +561,7 @@ export default function AIChatSidebar({ isOpen, onClose, countryFocus, onClearCo
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 ? (
           <div className="text-center py-8">
-            <img 
-              src="/un_logo.svg.png" 
-              alt="United Nations" 
-              className="h-16 w-auto mx-auto mb-4"
-            />
+            <div className="text-4xl mb-4">💡</div>
             <h3 className="font-medium text-neutral-900 mb-2">Ask about humanitarian crises</h3>
             <p className="text-sm text-neutral-500 mb-6">
               I can help you explore crisis data, funding gaps, and regional needs.
@@ -693,32 +657,15 @@ export default function AIChatSidebar({ isOpen, onClose, countryFocus, onClearCo
       {/* Input area */}
       <form onSubmit={handleSubmit} className="border-t border-neutral-200 p-4">
         <div className="flex gap-2">
-          <div className="flex-1 flex items-center gap-2 rounded-lg border border-neutral-200 px-3 py-2 focus-within:border-neutral-400 focus-within:ring-1 focus-within:ring-neutral-400">
-            {activeCountryTag && (
-              <span className="flex items-center gap-1 rounded bg-blue-100 px-2 py-0.5 text-xs text-blue-800">
-                {activeCountryTag.name}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setActiveCountryTag(null);
-                    onClearCountryFocus?.();
-                  }}
-                  className="ml-1 hover:text-blue-600"
-                >
-                  ×
-                </button>
-              </span>
-            )}
-            <input
-              ref={inputRef}
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder={activeCountryTag ? `Ask about ${activeCountryTag.name}...` : "Ask about crisis data..."}
-              disabled={isLoading}
-              className="flex-1 text-sm focus:outline-none disabled:bg-transparent disabled:text-neutral-400"
-            />
-          </div>
+          <input
+            ref={inputRef}
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Ask about crisis data..."
+            disabled={isLoading}
+            className="flex-1 rounded-lg border border-neutral-200 px-3 py-2 text-sm focus:border-neutral-400 focus:outline-none focus:ring-1 focus:ring-neutral-400 disabled:bg-neutral-50 disabled:text-neutral-400"
+          />
           <button
             type="submit"
             disabled={!input.trim() || isLoading}
@@ -729,6 +676,9 @@ export default function AIChatSidebar({ isOpen, onClose, countryFocus, onClearCo
             </svg>
           </button>
         </div>
+        <p className="mt-2 text-xs text-neutral-400 text-center">
+          Powered by Cerebras • Data from HPC, INFORM, OCHA
+        </p>
       </form>
     </div>
   );

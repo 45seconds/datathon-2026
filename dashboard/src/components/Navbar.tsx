@@ -10,30 +10,11 @@ interface NavbarProps {
 }
 
 const DATASETS = [
-  // === Humanitarian Needs & Response Plans ===
   { id: 'hpc_hno_2024', label: 'HPC HNO 2024', path: 'data/geo_mismatch/hpc_hno_2024.csv' },
   { id: 'hpc_hno_2025', label: 'HPC HNO 2025', path: 'data/geo_mismatch/hpc_hno_2025.csv' },
   { id: 'hpc_hno_2026', label: 'HPC HNO 2026', path: 'data/geo_mismatch/hpc_hno_2026.csv' },
-  { id: 'hrp', label: 'Humanitarian Response Plans', path: 'data/geo_mismatch/humanitarian-response-plans.csv' },
-  { id: 'fts_country_monthly', label: 'FTS Country Monthly Funding ⭐', path: 'data/geo_mismatch/fts_country_monthly_funding.csv' },
-  { id: 'fts_plan_monthly', label: 'FTS Plan Monthly Funding', path: 'data/geo_mismatch/fts_plan_monthly_funding.csv' },
-  
-  // === Population Data (COD) ===
-  { id: 'cod_pop_admin0', label: 'Population (Country Level)', path: 'data/geo_mismatch/cod_population_admin0.csv' },
-  { id: 'cod_pop_admin4', label: 'Population (Admin 4)', path: 'data/geo_mismatch/cod_population_admin4.csv' },
-  
-  // === INFORM Severity Index ===
-  { id: 'inform_severity', label: 'INFORM Severity (2020-2025)', path: 'data/geo_mismatch/inform_severity_master_2020_2025.csv' },
-  { id: 'inform_cleaned', label: 'INFORM Severity (Cleaned) ⭐', path: 'data/geo_mismatch/inform_severity_cleaned.csv' },
-  
-  // === Aggregated Analysis Datasets (NEW) ===
-  { id: 'country_year_severity', label: 'Country-Year Analysis ⭐', path: 'data/geo_mismatch/country_year_severity_funding.csv' },
-  { id: 'hrp_inform_agg', label: 'HRP-INFORM Aggregated ⭐', path: 'data/geo_mismatch/hrp_inform_aggregated_for_analysis.csv' },
-  { id: 'hrp_inform_intersection', label: 'HRP-INFORM Intersection ⭐', path: 'data/geo_mismatch/hrp_inform_severity_intersection.csv' },
-  
-  // === Challenge 1 Outputs (NEW) ===
-  { id: 'challenge1_outliers', label: 'Challenge 1: Outlier Projects ⭐', path: 'outputs/challenge1_outlier_projects.csv' },
-  { id: 'challenge1_efficiency', label: 'Challenge 1: Cluster Efficiency ⭐', path: 'outputs/challenge1_cluster_efficiency_framework.csv' },
+  { id: 'hrp', label: 'Response Plans', path: 'data/geo_mismatch/humanitarian-response-plans.csv' },
+  { id: 'cod_pop_admin0', label: 'Population (Admin 0)', path: 'data/geo_mismatch/cod_population_admin0.csv' },
 ];
 
 const NOTEBOOKS = [
@@ -130,6 +111,7 @@ export function Navbar({ activeTab, onTabChange, onToggleChat, chatOpen }: Navba
 
   const isOverview = activeTab === 'overview';
   const isMaps = activeTab === 'maps';
+  const isPredictions = activeTab === 'predictions';
 
   return (
     <header className="sticky top-0 z-50 flex h-12 items-center border-b border-neutral-200 bg-white px-6">
@@ -159,12 +141,9 @@ export function Navbar({ activeTab, onTabChange, onToggleChat, chatOpen }: Navba
           />
         </div>
         
-        <button 
-          onClick={() => handleTabClick('overview')}
-          className="text-sm font-medium text-neutral-900 hover:text-neutral-600 transition-colors cursor-pointer"
-        >
+        <span className="text-sm font-medium text-neutral-900">
           DSC Datathon 2026
-        </button>
+        </span>
         <nav className="flex items-center">
           <button
             onClick={() => handleTabClick('overview')}
@@ -181,6 +160,14 @@ export function Navbar({ activeTab, onTabChange, onToggleChat, chatOpen }: Navba
             }`}
           >
             Maps
+          </button>
+          <button
+            onClick={() => handleTabClick('predictions')}
+            className={`px-3 py-1.5 text-sm transition-colors ${
+              isPredictions ? 'text-neutral-900' : 'text-neutral-500 hover:text-neutral-900'
+            }`}
+          >
+            Predictions
           </button>
           <Dropdown
             label="Datasets"
