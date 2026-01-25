@@ -157,7 +157,11 @@ ${JSON.stringify(context.inform?.slice(0, 15), null, 2)}
 }
 
 // Call Cerebras API
-async function callCerebras(messages: ChatMessage[]): Promise<string> {
+async function callCerebras(
+  messages: ChatMessage[], 
+  temperature: number = 0.7,
+  maxTokens: number = 1024
+): Promise<string> {
   if (!CEREBRAS_API_KEY) {
     throw new Error('Cerebras API key not configured');
   }
@@ -171,8 +175,8 @@ async function callCerebras(messages: ChatMessage[]): Promise<string> {
     body: JSON.stringify({
       model: 'llama-3.3-70b',
       messages,
-      max_tokens: 1024,
-      temperature: 0.7,
+      max_tokens: maxTokens,
+      temperature: temperature,
     }),
   });
 
@@ -184,6 +188,57 @@ async function callCerebras(messages: ChatMessage[]): Promise<string> {
 
   const data = await response.json();
   return data.choices?.[0]?.message?.content || 'No response generated.';
+}
+
+// Detect if query requires predictive agent using LLM
+async function isPredictiveQuery(message: string): Promise<boolean> {
+  try {
+    const detectionPrompt = `You are a query classifier for a humanitarian crisis analysis system.
+
+Your task: Determine if the user's query is asking for PREDICTIVE/FUTURE analysis or CURRENT/HISTORICAL data.
+
+PREDICTIVE queries ask about:
+- Future scenarios (2027, 2028, next year, coming years)
+- Predictions or forecasts
+- Planning strategies or recommendations
+- "What will happen", "How should we plan", "What if"
+- Policy interventions for the future
+- Trends and projections
+
+CURRENT/HISTORICAL queries ask about:
+- Existing data (2024, 2025, 2026)
+- Current statistics or facts
+- "What is", "Show me", "Tell me about"
+- Comparisons of existing data
+
+User query: "${message}"
+
+Respond with ONLY one word: "PREDICTIVE" or "CURRENT"`;
+
+    const response = await callCerebras(
+      [
+        { role: 'system', content: 'You are a query classifier. Respond with only one word: PREDICTIVE or CURRENT.' },
+        { role: 'user', content: detectionPrompt }
+      ],
+      0.3,  // Low temperature for consistent classification
+      50    // Only need one word
+    );
+
+    const classification = response.trim().toUpperCase();
+    return classification.includes('PREDICTIVE');
+  } catch (error) {
+    console.error('Error in LLM-based detection, falling back to keywords:', error);
+    // Fallback to keyword-based detection if LLM fails
+    const predictiveKeywords = [
+      'predict', 'forecast', 'future', 'will be', 'will happen', 'expect', 'anticipate',
+      'projection', 'trend', 'outlook', 'scenario', 'plan', 'planning', 'strategy',
+      'next year', 'coming years', 'by 2027', 'by 2028', 'by 2029', 'by 2030',
+      'should prepare', 'should plan', 'what if', 'potential', 'likely',
+      'recommend', 'policy', 'intervention', 'prepare for', 'mitigation'
+    ];
+    const lowerMessage = message.toLowerCase();
+    return predictiveKeywords.some(keyword => lowerMessage.includes(keyword));
+  }
 }
 
 export async function POST(request: Request) {
@@ -213,6 +268,17 @@ export async function POST(request: Request) {
         error: 'AI service not configured',
         message: 'The Cerebras API key is not set. Please contact the administrator.'
       }, { status: 503 });
+    }
+
+    // Detect if this is a predictive query using LLM
+    const isPredictive = await isPredictiveQuery(sanitizedMessage);
+    
+    if (isPredictive) {
+      // Route to predictive agent
+      return NextResponse.json({
+        usePredictiveAgent: true,
+        message: sanitizedMessage,
+      });
     }
 
     // Extract year from message if mentioned
