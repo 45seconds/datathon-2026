@@ -391,6 +391,7 @@ export function CrisisMap({
         style={{ height: '100%', width: '100%' }}
         scrollWheelZoom={true}
         worldCopyJump={true}
+        preferCanvas={true}
         className="z-0"
       >
         <MapZoomController zoomToCountry={zoomToCountry || null} geoData={geoData} />
@@ -398,6 +399,8 @@ export function CrisisMap({
         <TileLayer
           attribution='&copy; <a href="https://carto.com/">CARTO</a>'
           url="https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png"
+          updateWhenZooming={false}
+          updateWhenIdle={true}
         />
         {geoData && (
           <GeoJSON
@@ -431,7 +434,11 @@ export function CrisisMap({
             </CircleMarker>
           ))}
         {/* Basemap labels overlay (few labels at low zoom, more as you zoom in) */}
-        <TileLayer url="https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png" />
+        <TileLayer 
+          url="https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png"
+          updateWhenZooming={false}
+          updateWhenIdle={true}
+        />
       </MapContainer>
 
       {/* Legend */}
