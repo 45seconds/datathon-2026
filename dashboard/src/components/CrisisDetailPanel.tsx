@@ -8,6 +8,7 @@ interface CrisisDetailPanelProps {
   iso3: string | null;
   year: number;
   onClose: () => void;
+  onAskAI?: (iso3: string, name: string, context: string) => void;
 }
 
 const CLUSTER_NAMES: Record<string, string> = {
@@ -33,7 +34,31 @@ function formatCurrency(num: number): string {
   return `$${formatNumber(num)}`;
 }
 
-export function CrisisDetailPanel({ iso3, year, onClose }: CrisisDetailPanelProps) {
+function buildContextString(detail: CrisisDetail, year: number): string {
+  const lines = [
+    `Country: ${detail.country} (${detail.region})`,
+    `Year: ${year}`,
+    `Population in Need: ${detail.currentMetrics.inNeed.toLocaleString()} (${(detail.currentMetrics.needRate * 100).toFixed(1)}% of population)`,
+    `Coverage Rate: ${(detail.currentMetrics.coverageRate * 100).toFixed(1)}%`,
+    `Funding: $${detail.currentMetrics.revisedRequirements.toLocaleString()} ($${detail.currentMetrics.usdPerPersonInNeed.toFixed(0)}/person)`,
+    `Mismatch: ${detail.currentMetrics.mismatch > 0 ? '+' : ''}${(detail.currentMetrics.mismatch * 100).toFixed(0)}%`,
+  ];
+
+  if (detail.severity) {
+    lines.push(`Severity Index: ${detail.severity.severityIndex.toFixed(1)}/5.0`);
+    lines.push(`Crisis Type: ${detail.severity.crisisType}`);
+    lines.push(`Primary Driver: ${detail.severity.primaryDriver}`);
+  }
+
+  if (detail.timeline) {
+    lines.push(`First Response: ${detail.timeline.firstResponseDate}`);
+    lines.push(`Years of Response: ${detail.timeline.yearsSinceFirstResponse.toFixed(1)}`);
+  }
+
+  return lines.join('\n');
+}
+
+export function CrisisDetailPanel({ iso3, year, onClose, onAskAI }: CrisisDetailPanelProps) {
   const [detail, setDetail] = useState<CrisisDetail | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -206,6 +231,32 @@ export function CrisisDetailPanel({ iso3, year, onClose }: CrisisDetailPanelProp
                 {detail.sources.map((s) => s.name).join(' · ')}
               </div>
             </section>
+
+            {/* Ask AI About This Country */}
+            {onAskAI && (
+              <section className="pt-4 border-t border-neutral-100">
+                <button
+                  onClick={() => {
+                    const context = buildContextString(detail, year);
+                    onAskAI(iso3!, detail.country, context);
+                  }}
+                  className="w-full flex items-center gap-3 rounded-lg border border-neutral-200 bg-neutral-50 px-4 py-3 text-left transition-colors hover:bg-neutral-100 hover:border-neutral-300"
+                >
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-100">
+                    <svg className="h-4 w-4 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-neutral-900">Ask AI about {detail.country}</p>
+                    <p className="text-xs text-neutral-500">Get insights using crisis context</p>
+                  </div>
+                  <svg className="h-4 w-4 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </section>
+            )}
           </div>
         )}
       </div>

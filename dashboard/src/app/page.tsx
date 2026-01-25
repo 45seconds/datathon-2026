@@ -46,6 +46,14 @@ export default function Home() {
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [zoomToCountry, setZoomToCountry] = useState<string | null>(null);
   const [showAIChat, setShowAIChat] = useState(false);
+  const [aiCountryFocus, setAiCountryFocus] = useState<{ iso3: string; name: string; context: string } | null>(null);
+
+  // Handler for opening AI chat with country context
+  const handleAskAIAboutCountry = (iso3: string, name: string, context: string) => {
+    setAiCountryFocus({ iso3, name, context });
+    setSelectedCountry(null); // Close the detail panel
+    setShowAIChat(true);
+  };
 
   // Listen for country selection from map popup button (for "View Full Details")
   useEffect(() => {
@@ -136,7 +144,12 @@ export default function Home() {
 
       
       {/* AI Chat Sidebar */}
-      <AIChatSidebar isOpen={showAIChat} onClose={() => setShowAIChat(false)} />
+      <AIChatSidebar 
+        isOpen={showAIChat} 
+        onClose={() => setShowAIChat(false)} 
+        countryFocus={aiCountryFocus}
+        onClearCountryFocus={() => setAiCountryFocus(null)}
+      />
 
       {/* Main content wrapper - adjusts when AI chat is open */}
       <div className={`transition-all duration-300 ${showAIChat ? 'mr-[400px]' : ''}`}>
@@ -291,6 +304,7 @@ export default function Home() {
             iso3={selectedCountry}
             year={mapYear}
             onClose={() => setSelectedCountry(null)}
+            onAskAI={handleAskAIAboutCountry}
           />
         </div>
       )}
