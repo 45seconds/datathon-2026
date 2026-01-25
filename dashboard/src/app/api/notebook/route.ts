@@ -3,6 +3,7 @@ import { supabase } from '@/lib/supabase';
 
 // Allowed notebook paths for security
 const ALLOWED_NOTEBOOKS = [
+  'notebooks/DSC_Datathon.ipynb',
   'notebooks/geo_mismatch.ipynb',
   'notebooks/DSC_Datathon_2026_Starter_Notebook.ipynb',
   'notebooks/challenge1_smart_beneficiary_targeting_validation.ipynb',
