@@ -9,6 +9,11 @@ from pathlib import Path
 import warnings
 warnings.filterwarnings('ignore')
 
+import logging
+
+# Silence noisy MLflow/Alembic logs (keep ERROR/CRITICAL only)
+logging.disable(logging.WARNING)
+
 # ML imports
 from sklearn.model_selection import train_test_split, cross_val_score, TimeSeriesSplit
 from sklearn.preprocessing import StandardScaler, RobustScaler
@@ -419,7 +424,7 @@ def main():
         with mlflow.start_run(run_name=f"2027_Predictions_{model_type.upper()}"):
             mlflow.log_params(best_params)
             mlflow.log_metrics(metrics)
-            mlflow.sklearn.log_model(predictor.model, f"model_{model_type}")
+            mlflow.sklearn.log_model(predictor.model, name=f"model_{model_type}")
     
     # Select best model
     print(f"\n{'='*80}")

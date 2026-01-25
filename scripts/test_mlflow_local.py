@@ -19,6 +19,11 @@ Results:
 import warnings
 warnings.filterwarnings('ignore')
 
+import logging
+
+# Silence noisy MLflow/Alembic logs (keep ERROR/CRITICAL only)
+logging.disable(logging.WARNING)
+
 import pandas as pd
 import numpy as np
 from pathlib import Path

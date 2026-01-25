@@ -1,14 +1,8 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 
-// Allowed notebook paths for security
-const ALLOWED_NOTEBOOKS = [
-  'notebooks/DSC_Datathon.ipynb',
-  'notebooks/geo_mismatch.ipynb',
-  'notebooks/geo_mismatch_2.ipynb',
-  'notebooks/DSC_Datathon_2026_Starter_Notebook.ipynb',
-  'notebooks/challenge1_smart_beneficiary_targeting_validation.ipynb',
-];
+// Single allowed notebook - DSC Datathon Final Submission
+const ALLOWED_NOTEBOOK = 'notebooks/DSC_Datathon.ipynb';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -18,27 +12,40 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Missing path parameter' }, { status: 400 });
   }
 
-  // Security: Validate the path is allowed
-  if (!ALLOWED_NOTEBOOKS.includes(notebookPath)) {
+  // Security: Validate the path is allowed (only DSC_Datathon.ipynb)
+  if (notebookPath !== ALLOWED_NOTEBOOK) {
     return NextResponse.json({ error: 'Invalid notebook path' }, { status: 400 });
   }
 
   try {
-    // Convert path: notebooks/file.ipynb -> file.ipynb
-    const storagePath = notebookPath.replace('notebooks/', '');
-    
-    // Fetch from Supabase Storage
-    const { data, error } = await supabase.storage
-      .from('notebooks')
-      .download(storagePath);
+    // Storage layout can be either:
+    // - DSC_Datathon.ipynb (root of bucket)
+    // - notebooks/DSC_Datathon.ipynb (nested prefix in bucket)
+    // Try both to be robust across deployments.
+    const storageCandidates = Array.from(
+      new Set([notebookPath.replace(/^notebooks\//, ''), notebookPath].filter(Boolean)),
+    );
 
-    if (error || !data) {
-      console.error('Supabase Storage error:', error);
+    let blob: Blob | null = null;
+    let lastError: unknown = null;
+
+    for (const storagePath of storageCandidates) {
+      const { data, error } = await supabase.storage.from('notebooks').download(storagePath);
+      if (data) {
+        blob = data;
+        lastError = null;
+        break;
+      }
+      if (error) lastError = error;
+    }
+
+    if (!blob) {
+      console.error('Supabase Storage error:', lastError);
       return NextResponse.json({ error: 'Failed to load notebook from storage' }, { status: 500 });
     }
 
     // Parse notebook JSON
-    const content = await data.text();
+    const content = await blob.text();
     const notebook = JSON.parse(content);
     
     return NextResponse.json({ notebook });

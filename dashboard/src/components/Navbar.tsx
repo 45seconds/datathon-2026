@@ -36,12 +36,8 @@ const DATASETS = [
   { id: 'challenge1_efficiency', label: 'Challenge 1: Cluster Efficiency ⭐', path: 'outputs/challenge1_cluster_efficiency_framework.csv' },
 ];
 
-const NOTEBOOKS = [
-  { id: 'dsc_datathon', label: 'Final Submission', path: 'notebooks/DSC_Datathon.ipynb' },
-  { id: 'geo_mismatch', label: 'Geo-Mismatch Analysis', path: 'notebooks/geo_mismatch.ipynb' },
-  { id: 'geo_mismatch_2', label: 'Geo-Mismatch 2', path: 'notebooks/geo_mismatch_2.ipynb' },
-  { id: 'challenge1', label: 'Challenge 1: Beneficiary Targeting', path: 'notebooks/challenge1_smart_beneficiary_targeting_validation.ipynb' },
-];
+// Single notebook - DSC Datathon Final Submission
+const NOTEBOOK_PATH = 'notebooks/DSC_Datathon.ipynb';
 
 function Dropdown({
   label,
@@ -108,29 +104,26 @@ function Dropdown({
 
 export function Navbar({ activeTab, onTabChange, onToggleChat, chatOpen }: NavbarProps) {
   const [activeDataset, setActiveDataset] = useState<string | undefined>();
-  const [activeNotebook, setActiveNotebook] = useState<string | undefined>();
 
   const handleDatasetSelect = (id: string, path: string) => {
     setActiveDataset(id);
-    setActiveNotebook(undefined);
     onTabChange(`dataset:${path}`);
   };
 
-  const handleNotebookSelect = (id: string, path: string) => {
-    setActiveNotebook(id);
+  const handleNotebookClick = () => {
     setActiveDataset(undefined);
-    onTabChange(`notebook:${path}`);
+    onTabChange(`notebook:${NOTEBOOK_PATH}`);
   };
 
   const handleTabClick = (tab: string) => {
     setActiveDataset(undefined);
-    setActiveNotebook(undefined);
     onTabChange(tab);
   };
 
   const isOverview = activeTab === 'overview';
   const isMaps = activeTab === 'maps';
   const isPredictions = activeTab === 'predictions';
+  const isNotebook = activeTab === `notebook:${NOTEBOOK_PATH}`;
 
   return (
     <header className="sticky top-0 z-50 flex h-12 items-center border-b border-neutral-200 bg-white px-6">
@@ -197,12 +190,14 @@ export function Navbar({ activeTab, onTabChange, onToggleChat, chatOpen }: Navba
             onSelect={handleDatasetSelect}
             activeId={activeDataset}
           />
-          <Dropdown
-            label="Notebooks"
-            items={NOTEBOOKS}
-            onSelect={handleNotebookSelect}
-            activeId={activeNotebook}
-          />
+          <button
+            onClick={handleNotebookClick}
+            className={`px-3 py-1.5 text-sm transition-colors ${
+              isNotebook ? 'text-neutral-900' : 'text-neutral-500 hover:text-neutral-900'
+            }`}
+          >
+            Notebook
+          </button>
         </nav>
       </div>
 

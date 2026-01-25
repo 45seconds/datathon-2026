@@ -20,17 +20,61 @@ export function NotebookViewer({ notebook, loading }: NotebookViewerProps) {
   const [showCode, setShowCode] = useState(false);
 
   const displayNotebook = useMemo(() => {
-    if (!notebook || showCode) return notebook;
-    
-    return {
+    if (!notebook) return notebook;
+
+    // Remove noisy MLflow/Alembic log spam from saved notebook outputs.
+    // This keeps the rendered notebook clean without mutating the underlying file.
+    const NOISY_OUTPUT_SUBSTRINGS = [
+      'alembic.runtime.plugins:',
+      'alembic.runtime.migration:',
+      'mlflow.store.db.utils:',
+      'mlflow.models.model: `artifact_path` is deprecated.',
+    ];
+
+    const cleaned = {
       ...notebook,
-      cells: notebook.cells?.map((cell) => {
-        if (cell.cell_type === 'code') {
-          return { ...cell, source: [] };
-        }
-        return cell;
+      cells: notebook.cells?.map((cell: any) => {
+        if (cell?.cell_type !== 'code') return cell;
+
+        const outputs = Array.isArray(cell.outputs)
+          ? cell.outputs
+              .map((out: any) => {
+                if (out?.output_type !== 'stream') return out;
+
+                const textArr: string[] = Array.isArray(out.text)
+                  ? out.text
+                  : typeof out.text === 'string'
+                    ? [out.text]
+                    : [];
+
+                const filteredText = textArr.filter(
+                  (line) => !NOISY_OUTPUT_SUBSTRINGS.some((s) => line.includes(s)),
+                );
+
+                if (filteredText.length === 0) return null;
+
+                return {
+                  ...out,
+                  text: Array.isArray(out.text) ? filteredText : filteredText.join(''),
+                };
+              })
+              .filter(Boolean)
+          : cell.outputs;
+
+        return {
+          ...cell,
+          outputs,
+          source: showCode ? cell.source : [],
+        };
       }),
     };
+
+    // If showCode is true, we keep original non-code cells exactly as-is
+    // (code cells above already preserve source).
+    if (showCode) return cleaned;
+
+    // When code is hidden, ensure we didn't accidentally hide code sources in non-code cells.
+    return cleaned;
   }, [notebook, showCode]);
 
   if (loading) {
