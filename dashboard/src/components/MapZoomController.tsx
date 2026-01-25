@@ -82,8 +82,11 @@ export function MapZoomController({ zoomToCountry, geoData }: MapZoomControllerP
     
     if (center) {
       const UNIVERSAL_ZOOM_LEVEL = 5;
-      // Use shorter duration for snappier feel
-      map.flyTo(center, UNIVERSAL_ZOOM_LEVEL, { duration: 0.8 });
+      // Smooth animation with easing
+      map.flyTo(center, UNIVERSAL_ZOOM_LEVEL, { 
+        duration: 1.2,
+        easeLinearity: 0.2  // Lower = more curved easing (smoother start/end)
+      });
     }
   }, [zoomToCountry, countryCenters, map]);
 
