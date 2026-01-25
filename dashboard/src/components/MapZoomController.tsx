@@ -1,9 +1,8 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useMap } from 'react-leaflet';
-import type { FeatureCollection, Geometry } from 'geojson';
-import L from 'leaflet';
+import type { FeatureCollection, Geometry, Position } from 'geojson';
 
 interface CountryProperties {
   name: string;
@@ -18,32 +17,75 @@ interface MapZoomControllerProps {
   geoData: GeoJSONData | null;
 }
 
+// Pre-calculate country centers from coordinates (faster than creating GeoJSON layers)
+function calculateCenter(geometry: Geometry): [number, number] | null {
+  try {
+    const coords: Position[] = [];
+    
+    const extractCoords = (c: unknown): void => {
+      if (!Array.isArray(c)) return;
+      if (c.length >= 2 && typeof c[0] === 'number' && typeof c[1] === 'number') {
+        coords.push(c as Position);
+      } else {
+        c.forEach(extractCoords);
+      }
+    };
+    
+    if ('coordinates' in geometry) {
+      extractCoords(geometry.coordinates);
+    }
+    
+    if (coords.length === 0) return null;
+    
+    // Calculate centroid
+    let sumLat = 0, sumLng = 0;
+    coords.forEach(([lng, lat]) => {
+      sumLng += lng;
+      sumLat += lat;
+    });
+    
+    return [sumLat / coords.length, sumLng / coords.length];
+  } catch {
+    return null;
+  }
+}
+
 export function MapZoomController({ zoomToCountry, geoData }: MapZoomControllerProps) {
   const map = useMap();
 
-  useEffect(() => {
-    if (!zoomToCountry || !geoData) return;
-
-    // Find the country feature
-    const feature = geoData.features.find(
-      (f) => f.properties['ISO3166-1-Alpha-3'] === zoomToCountry
-    );
-
-    if (feature && feature.geometry) {
-      try {
-        const geoJsonLayer = L.geoJSON(feature);
-        const bounds = geoJsonLayer.getBounds();
-        if (bounds.isValid()) {
-          // Get the center of the country and fly to it with a fixed zoom level
-          const center = bounds.getCenter();
-          const UNIVERSAL_ZOOM_LEVEL = 5; // Consistent zoom for all countries
-          map.flyTo(center, UNIVERSAL_ZOOM_LEVEL, { duration: 1.5 });
+  // Pre-calculate centers for all countries (only recalculate when geoData changes)
+  const countryCenters = useMemo(() => {
+    if (!geoData) return new Map<string, [number, number]>();
+    
+    const centers = new Map<string, [number, number]>();
+    
+    // Only process original features (skip world copies with shifted coordinates)
+    geoData.features.forEach((f) => {
+      const iso3 = f.properties['ISO3166-1-Alpha-3'];
+      if (!iso3 || centers.has(iso3)) return; // Skip duplicates
+      
+      if (f.geometry) {
+        const center = calculateCenter(f.geometry);
+        if (center) {
+          centers.set(iso3, center);
         }
-      } catch (error) {
-        console.error('Error zooming to country:', error);
       }
+    });
+    
+    return centers;
+  }, [geoData]);
+
+  useEffect(() => {
+    if (!zoomToCountry) return;
+
+    const center = countryCenters.get(zoomToCountry);
+    
+    if (center) {
+      const UNIVERSAL_ZOOM_LEVEL = 5;
+      // Use shorter duration for snappier feel
+      map.flyTo(center, UNIVERSAL_ZOOM_LEVEL, { duration: 0.8 });
     }
-  }, [zoomToCountry, geoData, map]);
+  }, [zoomToCountry, countryCenters, map]);
 
   return null;
 }
