@@ -165,6 +165,7 @@ interface CrisisMapProps {
   showCities: boolean;
   year: number;
   onCountrySelect?: (iso3: string) => void;
+  onCountryClick?: (iso3: string) => void;
   zoomToCountry?: string | null;
   language?: UNLanguage;
 }
@@ -268,6 +269,7 @@ export function CrisisMap({
   showCities,
   year,
   onCountrySelect,
+  onCountryClick,
   zoomToCountry,
   language = 'en',
 }: CrisisMapProps) {
@@ -362,10 +364,12 @@ export function CrisisMap({
         </div>
       `);
       
-      // Ensure map layer is clickable (no-op; popup handles interaction)
-      if (onCountrySelect) {
-        layer.on('click', () => {});
-      }
+      // Trigger zoom when country is clicked
+      layer.on('click', () => {
+        if (onCountryClick) {
+          onCountryClick(iso3);
+        }
+      });
     }
   };
 
