@@ -45,6 +45,10 @@ const ISO3_TO_ISO2: Record<string, string> = {
   ZMB: 'ZM',
 };
 
+export function getISO2FromISO3(iso3: string): string | null {
+  return ISO3_TO_ISO2[iso3] ?? null;
+}
+
 export function getCountryFlag(iso3: string): string {
   const iso2 = ISO3_TO_ISO2[iso3];
   if (!iso2) return '';
