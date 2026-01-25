@@ -10,11 +10,28 @@ interface NavbarProps {
 }
 
 const DATASETS = [
+  // === Humanitarian Needs & Response Plans ===
   { id: 'hpc_hno_2024', label: 'HPC HNO 2024', path: 'data/geo_mismatch/hpc_hno_2024.csv' },
   { id: 'hpc_hno_2025', label: 'HPC HNO 2025', path: 'data/geo_mismatch/hpc_hno_2025.csv' },
   { id: 'hpc_hno_2026', label: 'HPC HNO 2026', path: 'data/geo_mismatch/hpc_hno_2026.csv' },
-  { id: 'hrp', label: 'Response Plans', path: 'data/geo_mismatch/humanitarian-response-plans.csv' },
-  { id: 'cod_pop_admin0', label: 'Population (Admin 0)', path: 'data/geo_mismatch/cod_population_admin0.csv' },
+  { id: 'hrp', label: 'Humanitarian Response Plans', path: 'data/geo_mismatch/humanitarian-response-plans.csv' },
+  
+  // === Population Data (COD) ===
+  { id: 'cod_pop_admin0', label: 'Population (Country Level)', path: 'data/geo_mismatch/cod_population_admin0.csv' },
+  { id: 'cod_pop_admin4', label: 'Population (Admin 4)', path: 'data/geo_mismatch/cod_population_admin4.csv' },
+  
+  // === INFORM Severity Index ===
+  { id: 'inform_severity', label: 'INFORM Severity (2020-2025)', path: 'data/geo_mismatch/inform_severity_master_2020_2025.csv' },
+  { id: 'inform_cleaned', label: 'INFORM Severity (Cleaned) ⭐', path: 'data/geo_mismatch/inform_severity_cleaned.csv' },
+  
+  // === Aggregated Analysis Datasets (NEW) ===
+  { id: 'country_year_severity', label: 'Country-Year Analysis ⭐', path: 'data/geo_mismatch/country_year_severity_funding.csv' },
+  { id: 'hrp_inform_agg', label: 'HRP-INFORM Aggregated ⭐', path: 'data/geo_mismatch/hrp_inform_aggregated_for_analysis.csv' },
+  { id: 'hrp_inform_intersection', label: 'HRP-INFORM Intersection ⭐', path: 'data/geo_mismatch/hrp_inform_severity_intersection.csv' },
+  
+  // === Challenge 1 Outputs (NEW) ===
+  { id: 'challenge1_outliers', label: 'Challenge 1: Outlier Projects ⭐', path: 'outputs/challenge1_outlier_projects.csv' },
+  { id: 'challenge1_efficiency', label: 'Challenge 1: Cluster Efficiency ⭐', path: 'outputs/challenge1_cluster_efficiency_framework.csv' },
 ];
 
 const NOTEBOOKS = [
@@ -117,9 +134,27 @@ export function Navbar({ activeTab, onTabChange, onToggleChat, chatOpen }: Navba
       <div className="flex items-center gap-6">
         {/* Partner Logos */}
         <div className="flex items-center gap-4 border-r border-neutral-200 pr-6 pl-0">
-          <img src="/cmudatascience_logo.png" alt="CMU Data Science Club" className="h-7 w-auto" title="CMU Data Science Club" />
-          <img src="/databricks_logo.png" alt="Databricks" className="h-6 w-auto" title="Databricks" />
-          <img src="/un_logo.svg.png" alt="United Nations" className="h-7 w-auto" title="United Nations" />
+          <img 
+            src="/cmudatascience_logo.png" 
+            alt="CMU Data Science Club" 
+            className="h-7 w-auto animate-swoop-in" 
+            style={{ animationDelay: '0.2s' }}
+            title="CMU Data Science Club" 
+          />
+          <img 
+            src="/databricks_logo.png" 
+            alt="Databricks" 
+            className="h-6 w-auto animate-swoop-in" 
+            style={{ animationDelay: '0.5s' }}
+            title="Databricks" 
+          />
+          <img 
+            src="/un_logo.svg.png" 
+            alt="United Nations" 
+            className="h-7 w-auto animate-swoop-in" 
+            style={{ animationDelay: '0.8s' }}
+            title="United Nations" 
+          />
         </div>
         
         <span className="text-sm font-medium text-neutral-900">

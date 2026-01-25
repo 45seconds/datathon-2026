@@ -24,12 +24,28 @@ function parseCSVLine(line: string): string[] {
 
 // Allowed dataset paths for security
 const ALLOWED_PATHS = [
+  // Humanitarian Needs & Response Plans
   'data/geo_mismatch/hpc_hno_2024.csv',
   'data/geo_mismatch/hpc_hno_2025.csv',
   'data/geo_mismatch/hpc_hno_2026.csv',
   'data/geo_mismatch/humanitarian-response-plans.csv',
+  
+  // Population Data (COD)
   'data/geo_mismatch/cod_population_admin0.csv',
+  'data/geo_mismatch/cod_population_admin4.csv',
+  
+  // INFORM Severity Index
   'data/geo_mismatch/inform_severity_master_2020_2025.csv',
+  'data/geo_mismatch/inform_severity_cleaned.csv',
+  
+  // Aggregated Analysis Datasets (NEW)
+  'data/geo_mismatch/country_year_severity_funding.csv',
+  'data/geo_mismatch/hrp_inform_aggregated_for_analysis.csv',
+  'data/geo_mismatch/hrp_inform_severity_intersection.csv',
+  
+  // Challenge 1 Outputs (NEW)
+  'outputs/challenge1_outlier_projects.csv',
+  'outputs/challenge1_cluster_efficiency_framework.csv',
 ];
 
 export async function GET(request: Request) {
