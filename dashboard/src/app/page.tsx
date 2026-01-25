@@ -6,6 +6,17 @@ import { CountryCrisisMetrics, DashboardSummary } from '@/types';
 import { getCountryFlag } from '@/lib/flags';
 import type { Ipynb } from 'react-ipynb-renderer';
 
+type UNLanguage = 'en' | 'fr' | 'es' | 'ru' | 'ar' | 'zh';
+
+const UN_LANGUAGE_OPTIONS: Array<{ code: UNLanguage; label: string }> = [
+  { code: 'en', label: 'English' },
+  { code: 'fr', label: 'Français' },
+  { code: 'es', label: 'Español' },
+  { code: 'ru', label: 'Русский' },
+  { code: 'ar', label: 'العربية' },
+  { code: 'zh', label: '中文' },
+];
+
 function formatNumber(num: number): string {
   if (num >= 1_000_000_000) return `${(num / 1_000_000_000).toFixed(1)}B`;
   if (num >= 1_000_000) return `${(num / 1_000_000).toFixed(1)}M`;
@@ -32,6 +43,7 @@ export default function Home() {
   const [mapColorBy, setMapColorBy] = useState<'needRate' | 'coverageRate' | 'usdPerPersonInNeed' | 'mismatch'>('needRate');
   const [showCities, setShowCities] = useState(true);
   const [mapYear, setMapYear] = useState(2026);
+  const [mapLanguage, setMapLanguage] = useState<UNLanguage>('en');
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [showQA, setShowQA] = useState(false);
   const [zoomToCountry, setZoomToCountry] = useState<string | null>(null);
@@ -245,6 +257,20 @@ export default function Home() {
               </select>
             </div>
             <div className="flex items-center gap-2">
+              <label className="text-xs text-neutral-500">Language</label>
+              <select
+                value={mapLanguage}
+                onChange={(e) => setMapLanguage(e.target.value as UNLanguage)}
+                className="rounded border border-neutral-200 bg-white px-2.5 py-1 text-sm text-neutral-700"
+              >
+                {UN_LANGUAGE_OPTIONS.map((opt) => (
+                  <option key={opt.code} value={opt.code}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="flex items-center gap-2">
               <label className="text-xs text-neutral-500">Year</label>
               <select
                 value={mapYear}
@@ -275,6 +301,7 @@ export default function Home() {
               year={mapYear}
               onCountrySelect={setSelectedCountry}
               zoomToCountry={zoomToCountry}
+              language={mapLanguage}
             />
           </div>
 

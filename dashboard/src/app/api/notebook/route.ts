@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase';
 const ALLOWED_NOTEBOOKS = [
   'notebooks/DSC_Datathon.ipynb',
   'notebooks/geo_mismatch.ipynb',
+  'notebooks/geo_mismatch_2.ipynb',
   'notebooks/DSC_Datathon_2026_Starter_Notebook.ipynb',
   'notebooks/challenge1_smart_beneficiary_targeting_validation.ipynb',
 ];

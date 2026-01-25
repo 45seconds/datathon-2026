@@ -33,7 +33,7 @@ export function DataTable({ data, title, description, onCountryClick }: DataTabl
         {description && <p className="mt-1 text-sm text-neutral-500">{description}</p>}
         {onCountryClick && (
           <p className="mt-1 text-xs text-neutral-400">
-            💡 Click on any country to view it on the map
+            Click on any country to view it on the map
           </p>
         )}
       </div>

@@ -20,7 +20,8 @@ const DATASETS = [
 const NOTEBOOKS = [
   { id: 'dsc_datathon', label: 'Final Submission', path: 'notebooks/DSC_Datathon.ipynb' },
   { id: 'geo_mismatch', label: 'Geo-Mismatch Analysis', path: 'notebooks/geo_mismatch.ipynb' },
-  { id: 'starter', label: 'Starter Notebook', path: 'notebooks/DSC_Datathon_2026_Starter_Notebook.ipynb' },
+  { id: 'geo_mismatch_2', label: 'Geo-Mismatch 2', path: 'notebooks/geo_mismatch_2.ipynb' },
+  { id: 'challenge1', label: 'Challenge 1: Beneficiary Targeting', path: 'notebooks/challenge1_smart_beneficiary_targeting_validation.ipynb' },
 ];
 
 function Dropdown({
