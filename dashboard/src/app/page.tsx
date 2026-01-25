@@ -115,6 +115,7 @@ export default function Home() {
   // Handler for "Ask AI" from country detail panel
   const handleAskAIAboutCountry = (countryName: string, context: string) => {
     setAiCountryFocus({ countryName, context });
+    setSelectedCountry(null); // Close the detail panel to show AI chat
     setShowAIChat(true);
   };
 
