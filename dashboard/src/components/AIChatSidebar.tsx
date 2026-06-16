@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface Source {
   name: string;
@@ -55,6 +57,57 @@ interface AIChatSidebarProps {
   onClose: () => void;
   countryFocus?: CountryFocus | null;
   onClearCountryFocus?: () => void;
+}
+
+// Safely extract a plain-text answer from a string that might be raw JSON
+function extractAnswer(text: string): string {
+  if (!text) return text;
+  const trimmed = text.trim();
+  if (trimmed.startsWith('{')) {
+    try {
+      const parsed = JSON.parse(trimmed);
+      if (typeof parsed.answer === 'string') return parsed.answer;
+    } catch { /* not valid JSON, use as-is */ }
+  }
+  return text;
+}
+
+// Shared markdown renderer with GFM (tables, bold, etc.)
+function Markdown({ children }: { children: string }) {
+  return (
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      components={{
+        table: ({ children }) => (
+          <div className="overflow-x-auto my-2">
+            <table className="min-w-full text-xs border-collapse">{children}</table>
+          </div>
+        ),
+        thead: ({ children }) => <thead className="bg-neutral-100">{children}</thead>,
+        th: ({ children }) => (
+          <th className="border border-neutral-300 px-2 py-1 text-left font-semibold text-neutral-800">{children}</th>
+        ),
+        td: ({ children }) => (
+          <td className="border border-neutral-300 px-2 py-1 text-neutral-700">{children}</td>
+        ),
+        h1: ({ children }) => <h1 className="text-base font-bold text-neutral-900 mt-3 mb-1">{children}</h1>,
+        h2: ({ children }) => <h2 className="text-sm font-bold text-neutral-900 mt-3 mb-1">{children}</h2>,
+        h3: ({ children }) => <h3 className="text-sm font-semibold text-neutral-800 mt-2 mb-1">{children}</h3>,
+        p: ({ children }) => <p className="mb-2 leading-relaxed">{children}</p>,
+        ul: ({ children }) => <ul className="list-disc pl-4 mb-2 space-y-0.5">{children}</ul>,
+        ol: ({ children }) => <ol className="list-decimal pl-4 mb-2 space-y-0.5">{children}</ol>,
+        li: ({ children }) => <li className="text-neutral-700">{children}</li>,
+        strong: ({ children }) => <strong className="font-semibold text-neutral-900">{children}</strong>,
+        em: ({ children }) => <em className="italic text-neutral-600">{children}</em>,
+        code: ({ children }) => <code className="bg-neutral-100 rounded px-1 text-xs font-mono">{children}</code>,
+        blockquote: ({ children }) => (
+          <blockquote className="border-l-2 border-neutral-300 pl-3 italic text-neutral-600 my-2">{children}</blockquote>
+        ),
+      }}
+    >
+      {children}
+    </ReactMarkdown>
+  );
 }
 
 // Source citation dropdown component
@@ -155,7 +208,9 @@ function PredictiveAnswer({ data }: { data: PredictiveResponse }) {
           </svg>
           <span className="font-semibold text-blue-900">Predictive Analysis</span>
         </div>
-        <p className="text-neutral-700 whitespace-pre-wrap">{data.answer}</p>
+        <div className="text-neutral-700 text-sm">
+          <Markdown>{extractAnswer(data.answer)}</Markdown>
+        </div>
       </div>
 
       {/* Qualitative Rationale */}
@@ -180,8 +235,8 @@ function PredictiveAnswer({ data }: { data: PredictiveResponse }) {
           </svg>
         </button>
         {expandedSection === 'qualitative' && (
-          <div className="px-3 pb-3 text-neutral-700 whitespace-pre-wrap border-t border-neutral-200 pt-3 max-h-96 overflow-y-auto">
-            {data.qualitativeRationale}
+          <div className="px-3 pb-3 text-neutral-700 text-sm border-t border-neutral-200 pt-3 max-h-96 overflow-y-auto">
+            <Markdown>{data.qualitativeRationale}</Markdown>
           </div>
         )}
       </div>
@@ -208,8 +263,8 @@ function PredictiveAnswer({ data }: { data: PredictiveResponse }) {
           </svg>
         </button>
         {expandedSection === 'quantitative' && (
-          <div className="px-3 pb-3 text-neutral-700 whitespace-pre-wrap border-t border-neutral-200 pt-3 max-h-96 overflow-y-auto">
-            {data.quantitativeRationale}
+          <div className="px-3 pb-3 text-neutral-700 text-sm border-t border-neutral-200 pt-3 max-h-96 overflow-y-auto">
+            <Markdown>{data.quantitativeRationale}</Markdown>
           </div>
         )}
       </div>
@@ -368,8 +423,8 @@ function PredictiveAnswer({ data }: { data: PredictiveResponse }) {
                   <div className="font-medium text-neutral-900 text-xs mb-1">
                     Cycle {cycle.iteration}: {cycle.query}
                   </div>
-                  <div className="text-neutral-600 text-xs whitespace-pre-wrap">
-                    {cycle.findings.slice(0, 200)}...
+                  <div className="text-neutral-600 text-xs">
+                    {cycle.findings.slice(0, 200)}…
                   </div>
                 </div>
               ))}
@@ -634,7 +689,11 @@ export default function AIChatSidebar({ isOpen, onClose, countryFocus, onClearCo
                   <PredictiveAnswer data={message.predictive} />
                 ) : (
                   <>
-                    <div className="text-sm whitespace-pre-wrap">{message.content}</div>
+                    <div className="text-sm">
+                      {message.role === 'assistant'
+                        ? <Markdown>{message.content}</Markdown>
+                        : message.content}
+                    </div>
                     {message.role === 'assistant' && message.sources && (
                       <SourceCitation sources={message.sources} />
                     )}
