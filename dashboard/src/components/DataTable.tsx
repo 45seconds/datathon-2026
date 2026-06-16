@@ -1,5 +1,5 @@
 import { CountryCrisisMetrics } from '@/types';
-import { getCountryFlag } from '@/lib/flags';
+import { CountryFlag } from './CountryFlag';
 
 interface DataTableProps {
   data: CountryCrisisMetrics[];
@@ -59,7 +59,7 @@ export function DataTable({ data, title, description, onCountryClick }: DataTabl
               >
                 <td className="py-3 pr-4">
                   <div className="flex items-center gap-2">
-                    <span className="text-base">{getCountryFlag(row.iso3)}</span>
+                    <CountryFlag iso3={row.iso3} />
                     <span className="text-neutral-900">{row.country}</span>
                     <span className="text-xs text-neutral-400">{row.iso3}</span>
                   </div>

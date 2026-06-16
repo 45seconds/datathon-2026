@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import type { CountryCrisisMetrics } from '@/types';
-import { getCountryFlag } from '@/lib/flags';
+import { getFlagUrl } from '@/lib/flags';
 import type { Feature, FeatureCollection, Geometry } from 'geojson';
 import type { Layer, PathOptions } from 'leaflet';
 
@@ -215,15 +215,6 @@ function formatNumber(num: number): string {
   return num.toFixed(0);
 }
 
-function getFlagFromISO2(iso2: string | undefined): string {
-  if (!iso2 || iso2.length !== 2) return '';
-  const codePoints = iso2
-    .toUpperCase()
-    .split('')
-    .map((char) => 0x1f1e6 + char.charCodeAt(0) - 65);
-  return String.fromCodePoint(...codePoints);
-}
-
 function getColor(value: number, metric: string): string {
   if (metric === 'needRate') {
     if (value > 0.6) return '#7f1d1d';
@@ -309,18 +300,20 @@ export function CrisisMap({
 
   const onEachFeature = (feature: CountryFeature, layer: Layer) => {
     const iso3 = feature.properties['ISO3166-1-Alpha-3'];
-    const iso2 = feature.properties['ISO3166-1-Alpha-2'];
     const countryData = dataByIso3.get(iso3);
 
     if (countryData) {
-      const flag = getFlagFromISO2(iso2) || getCountryFlag(iso3);
+      const flagUrl = getFlagUrl(iso3);
+      const flagImg = flagUrl
+        ? `<img src="${flagUrl}" alt="" style="width:24px;height:18px;border-radius:2px;object-fit:cover;vertical-align:middle;margin-right:6px;" />`
+        : '';
       // Keep original (English) country names from our GeoJSON
       const countryName = feature.properties.name || countryData.country;
 
       layer.bindPopup(`
         <div style="min-width: 240px; font-family: system-ui, -apple-system, sans-serif;">
-          <div style="font-size: 18px; font-weight: 600; margin-bottom: 4px;">
-            ${flag} ${countryName}
+          <div style="font-size: 18px; font-weight: 600; margin-bottom: 4px; display: flex; align-items: center;">
+            ${flagImg}<span>${countryName}</span>
           </div>
           <div style="font-size: 12px; color: #71717a; margin-bottom: 16px;">${iso3} · ${year}</div>
           <div style="display: grid; gap: 8px; font-size: 14px;">

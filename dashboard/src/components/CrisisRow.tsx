@@ -1,5 +1,5 @@
 import { CountryCrisisMetrics } from '@/types';
-import { getCountryFlag } from '@/lib/flags';
+import { CountryFlag } from './CountryFlag';
 
 interface CrisisRowProps {
   crisis: CountryCrisisMetrics & { mismatchScore?: number };
@@ -22,7 +22,7 @@ export function CrisisRow({ crisis, rank }: CrisisRowProps) {
         {rank}
       </span>
       
-      <span className="text-xl">{getCountryFlag(crisis.iso3)}</span>
+      <CountryFlag iso3={crisis.iso3} className="h-5 w-8 rounded-sm object-cover" />
       
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">

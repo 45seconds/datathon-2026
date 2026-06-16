@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getCountryFlag } from '@/lib/flags';
+import { CountryFlag } from './CountryFlag';
 import { AnimatedCounter } from './AnimatedCounter';
 import { RiskRadarChart } from './RiskRadarChart';
 
@@ -225,7 +225,7 @@ export function PredictionsView() {
                         <span className="flex h-6 w-6 items-center justify-center rounded text-xs font-medium text-neutral-500 bg-neutral-50">
                           {index + 1}
                         </span>
-                        <span className="text-xl">{getCountryFlag(pred.iso3)}</span>
+                        <CountryFlag iso3={pred.iso3} />
                         <div>
                           <h3 className="font-medium text-neutral-900">{pred.country}</h3>
                           <p className="text-xs text-neutral-500">

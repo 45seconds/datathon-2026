@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Navbar, DataTable, NotebookViewer, CrisisMap, DatasetViewer, CrisisDetailPanel, AIChatSidebar, PredictionsView } from '@/components';
 import { CountryCrisisMetrics, DashboardSummary } from '@/types';
-import { getCountryFlag } from '@/lib/flags';
+import { CountryFlag } from '@/components/CountryFlag';
 import type { Ipynb } from 'react-ipynb-renderer';
 
 type UNLanguage = 'en' | 'fr' | 'es' | 'ru' | 'ar' | 'zh';
@@ -208,7 +208,7 @@ export default function Home() {
                   >
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-medium text-neutral-400">#{index + 1}</span>
-                      <span className="text-lg">{getCountryFlag(crisis.iso3)}</span>
+                      <CountryFlag iso3={crisis.iso3} />
                     </div>
                     <h3 className="mt-2 font-medium text-neutral-900">{crisis.country}</h3>
                     <p className="text-xs text-neutral-500">{formatNumber(crisis.inNeed)} in need</p>

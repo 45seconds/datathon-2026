@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import type { CrisisDetail } from '@/types';
-import { getCountryFlag } from '@/lib/flags';
+import { CountryFlag } from './CountryFlag';
 
 interface CrisisDetailPanelProps {
   iso3: string | null;
@@ -486,7 +486,7 @@ export function CrisisDetailPanel({ iso3, year, onClose, onAskAI }: CrisisDetail
         <div className="flex items-center gap-3">
           {detail && (
             <>
-              <span className="text-2xl">{getCountryFlag(iso3)}</span>
+              <CountryFlag iso3={iso3} className="h-5 w-8 rounded-sm object-cover" />
               <div>
                 <h2 className="font-medium text-neutral-900">{detail.country}</h2>
                 <p className="text-xs text-neutral-500">{detail.region} · {iso3}</p>
