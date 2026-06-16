@@ -173,7 +173,7 @@ async function callCerebras(
       'Authorization': `Bearer ${CEREBRAS_API_KEY}`,
     },
     body: JSON.stringify({
-      model: 'llama-3.3-70b',
+      model: 'gpt-oss-120b',
       messages,
       max_tokens: maxTokens,
       temperature: temperature,
