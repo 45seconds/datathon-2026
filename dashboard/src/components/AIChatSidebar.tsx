@@ -93,7 +93,7 @@ function Markdown({ children }: { children: string }) {
         h1: ({ children }) => <h1 className="text-base font-bold text-neutral-900 mt-3 mb-1">{children}</h1>,
         h2: ({ children }) => <h2 className="text-sm font-bold text-neutral-900 mt-3 mb-1">{children}</h2>,
         h3: ({ children }) => <h3 className="text-sm font-semibold text-neutral-800 mt-2 mb-1">{children}</h3>,
-        p: ({ children }) => <p className="mb-2 leading-relaxed">{children}</p>,
+        p: ({ children }) => <p className="mb-2 leading-relaxed break-words">{children}</p>,
         ul: ({ children }) => <ul className="list-disc pl-4 mb-2 space-y-0.5">{children}</ul>,
         ol: ({ children }) => <ol className="list-decimal pl-4 mb-2 space-y-0.5">{children}</ol>,
         li: ({ children }) => <li className="text-neutral-700">{children}</li>,
@@ -612,7 +612,7 @@ export default function AIChatSidebar({ isOpen, onClose, countryFocus, onClearCo
   if (!isOpen) return null;
 
   return (
-    <div className="fixed right-0 top-12 z-50 flex h-[calc(100vh-48px)] w-[400px] flex-col border-l border-neutral-200 bg-white shadow-lg">
+    <div className="fixed right-0 top-12 z-50 flex h-[calc(100vh-48px)] w-[460px] flex-col border-l border-neutral-200 bg-white shadow-lg">
       {/* Header */}
       <div className="border-b border-neutral-200">
         <div className="flex items-center justify-between px-4 py-3">
@@ -677,10 +677,10 @@ export default function AIChatSidebar({ isOpen, onClose, countryFocus, onClearCo
               className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               <div
-                className={`${
-                  message.role === 'user' 
-                    ? 'max-w-[85%] bg-neutral-900 text-white rounded-lg px-3 py-2' 
-                    : message.predictive 
+                className={`min-w-0 break-words ${
+                  message.role === 'user'
+                    ? 'max-w-[85%] bg-neutral-900 text-white rounded-lg px-3 py-2'
+                    : message.predictive
                       ? 'w-full'
                       : 'max-w-[85%] bg-neutral-100 text-neutral-700 rounded-lg px-3 py-2'
                 }`}
