@@ -148,6 +148,14 @@ ${JSON.stringify(context.inform?.slice(0, 15), null, 2)}
 6. Keep responses concise but informative.
 7. If asked about non-humanitarian topics, redirect: "I'm focused on humanitarian crisis analysis. How can I help you understand the crisis data?"
 
+## Formatting Rules (ALWAYS follow these):
+- Use markdown formatting in every response.
+- Lead with a bold heading summarizing the answer (e.g., **Top mismatches (high need + low resources)**).
+- Present tabular data as a markdown table with a Rank column and bold values for key numbers.
+- Use **bold** to highlight the most important figures (mismatch score, funding gap, etc.).
+- End with a one or two sentence plain-language summary of what the data means.
+- Do not use bullet lists when a table is more appropriate.
+
 ## Key Metrics Explained:
 - mismatch: Higher values mean high need but low resources (most "forgotten" crises)
 - need_rate: Percentage of population in need
