@@ -331,117 +331,33 @@ async function synthesizeAnswer(
     `Research Cycle ${i + 1} - ${c.query}:\n${c.findings}`
   ).join('\n\n---\n\n');
 
-  const prompt = `You are a senior humanitarian strategist preparing a briefing for UN officials and researchers.
+  const prompt = `You are a humanitarian strategist. Synthesize the research into a BRIEF, high-signal briefing.
 
-Original Query: "${userQuery}"
+Query: "${userQuery}"
 
-Research Findings:
+Research:
 ${allFindings}
 
-Based on all research conducted, provide a comprehensive predictive analysis in the following JSON format:
+Return ONLY a raw JSON object (no markdown, no code fences):
 {
-  "answer": "CONCISE executive summary (2-3 SHORT paragraphs, ~150 words total):
-    - Lead with the most critical finding (1 sentence)
-    - Key projections with 2-3 specific numbers (1 paragraph)
-    - Primary implications (1 paragraph)
-    NO repetition. NO verbose explanations. Just the essential findings.",
-  
-  "qualitativeRationale": "DEEP CONTEXTUAL ANALYSIS (4-6 paragraphs, ~400 words):
-    
-    Paragraph 1: Root causes and drivers
-    - WHY are needs changing? Specific conflicts, climate events, economic factors
-    - Name specific events: 'Sudan conflict escalation April 2023', 'Ethiopia drought 2024-2025'
-    
-    Paragraph 2: Regional patterns with context
-    - East Africa: specific countries + specific causes (e.g., 'Somalia locust swarms decimated 40% of crops')
-    - Middle East: conflict dynamics and displacement patterns
-    - Compare regions with explanations
-    
-    Paragraph 3: Sectoral dynamics
-    - Which sectors underfunded and WHY
-    - Protection vs food security differences
-    - Examples: 'Health cluster in Yemen has only 28% coverage due to infrastructure destruction'
-    
-    Paragraph 4: Forgotten crisis patterns
-    - WHY do some crises get less funding?
-    - Media attention vs actual need disconnect
-    - 'Crisis fatigue' or donor priorities
-    
-    Paragraph 5: Surprising insights
-    - Counterintuitive findings with explanations
-    - Anomalies that reveal systemic issues
-    
-    Paragraph 6: Cross-cutting themes
-    - Patterns that appear across multiple crises
-    - Structural issues in humanitarian response",
-  
-  "quantitativeRationale": "EXTREME DATA DENSITY (4-6 paragraphs, ~500 words):
-    
-    Paragraph 1: Overall trends with EXACT numbers
-    - 'From 2024-2026: total need increased from 274.5M to 312.8M (+13.9%, +38.3M people)'
-    - '2027 projection: 348.2M people (+11.3% YoY)'
-    - Average coverage rate, funding gap, cost per person WITH NUMBERS
-    
-    Paragraph 2: Top 10 countries ranked
-    - 'Top 10 by need: 1) Sudan 22.1M, 2) Afghanistan 18.4M, 3) Yemen 17.8M, 4) Syria 16.7M, 5) Ethiopia 15.9M...'
-    - Need rates: 'South Sudan 69.0%, Syria 64.4%, Sudan 65.2%...'
-    - Coverage rates: 'Afghanistan 79.9%, Chad 77.7%, Somalia 75.8%...'
-    
-    Paragraph 3: Year-over-year changes
-    - 'Sudan: 2024 need 16.8M → 2025 20.3M → 2026 22.1M (24.6% 2-year growth)'
-    - 'Yemen: coverage dropped from 67.2% (2024) to 58.3% (2026), -13.2%'
-    - List 5-7 countries with specific YoY numbers
-    
-    Paragraph 4: Funding analysis
-    - 'Total funding gap: $142.3B across all crises'
-    - 'Largest gaps: Sudan $8.6B, Yemen $7.2B, Afghanistan $6.8B'
-    - 'Cost per person: Ukraine $212 vs CAR $45 (4.7x disparity)'
-    - 'Regional averages: MENA $168/person, Sub-Saharan $87/person'
-    
-    Paragraph 5: Sectoral breakdown
-    - 'Food security: 186.3M in need, 68% coverage'
-    - 'Protection: 94.7M in need, only 35% coverage (critical gap)'
-    - 'Health: 143.2M in need, 52% coverage'
-    - Compare sectors with numbers
-    
-    Paragraph 6: Statistical distributions
-    - 'Need rate distribution: median 29%, 75th percentile 45%, max 69%'
-    - 'Coverage rate: median 56%, IQR 48-69%'
-    - '15 countries exceed 50% need rate; 8 countries have <40% coverage'",
-  
-  "keyAssumptions": [
-    "Assumption with specific context (e.g., 'Assumes Sudan conflict does not expand beyond current Darfur region boundaries')",
-    "Assumption 2 with numbers/specifics",
-    "Assumption 3",
-    "Assumption 4",
-    "Assumption 5"
-  ],
-  
-  "recommendations": [
-    "Specific recommendation with 1-2 sentence rationale and concrete action (e.g., 'Increase protection sector funding by $2.3B to reach 60% coverage - currently 15M people lack access to protection services in conflict zones, creating cascading vulnerabilities')",
-    "Recommendation 2 with similar detail and rationale",
-    "Recommendation 3 with rationale",
-    "Recommendation 4 with rationale",
-    "Recommendation 5"
-  ]
+  "answer": "3-4 sentences max. Lead with the single most important finding + 2-3 key numbers. End with the primary risk or implication. No repetition.",
+
+  "qualitativeRationale": "2-3 short paragraphs. Cover: (1) root causes with specific named events, (2) the most underfunded sector and why, (3) one surprising or counterintuitive finding. Max 150 words total.",
+
+  "quantitativeRationale": "1-2 short paragraphs. Include: YoY need trend with exact figures, top 3-5 countries by need/gap, worst coverage sector with %, funding gap total. Max 150 words total.",
+
+  "keyAssumptions": ["3 assumptions, one sentence each"],
+
+  "recommendations": ["3 recommendations, one sentence each with a specific action and number"]
 }
 
-CRITICAL REQUIREMENTS:
-- answer: CONCISE (150 words max), NO repetition, just key findings
-- qualitativeRationale: 400+ words, explain WHY things happen, name specific events/conflicts
-- quantitativeRationale: 500+ words, PACK with numbers, exact figures, top-10 lists, YoY changes
-- recommendations: Each should be 2-3 sentences with specific rationale
-- Every number must be specific (no ranges like "30-40%", say "34.2%")
-- Name countries, regions, sectors explicitly
-- No vague statements - everything must be concrete
-
-Return ONLY valid JSON without any markdown formatting or code fences. Just return the raw JSON object.`;
+Be specific. Use real numbers from the research. No padding.`;
 
   console.log('Starting final synthesis...');
   const response = await callCerebras([
-    { role: 'system', content: 'You are a humanitarian strategist. Provide EXTREMELY detailed analysis. Return only valid JSON.' },
+    { role: 'system', content: 'You are a humanitarian strategist. Be concise and data-driven. Return only valid JSON.' },
     { role: 'user', content: prompt }
-  ], 0.7, 3072);  // Reduced from 4096 to help with rate limits
+  ], 0.7, 1200);
   console.log('Synthesis complete');
 
   try {

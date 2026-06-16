@@ -64,10 +64,14 @@ function extractAnswer(text: string): string {
   if (!text) return text;
   const trimmed = text.trim();
   if (trimmed.startsWith('{')) {
+    // Try full parse first
     try {
       const parsed = JSON.parse(trimmed);
       if (typeof parsed.answer === 'string') return parsed.answer;
-    } catch { /* not valid JSON, use as-is */ }
+    } catch { /* truncated JSON — fall through to regex */ }
+    // Regex fallback for truncated JSON
+    const m = trimmed.match(/"answer"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+    if (m) return m[1].replace(/\\n/g, '\n').replace(/\\"/g, '"');
   }
   return text;
 }
