@@ -1,9 +1,9 @@
 # DSC Datathon 2026
-Team: dvislawa — Dheeraj Vislawath, Kabir Singh, Abhinav Akkiraju, Todd Dong
+Team: Dheeraj Vislawath, Kabir Singh, Abhinav Akkiraju, Todd Dong
 
 We partnered with Databricks and the United Nations to build an analytics platform that helps aid officers prioritize humanitarian response. The project addresses two datathon challenges with a shared goal: surface where need is high, resources are low, and programs may be inefficient — then make those signals actionable through an interactive dashboard.
 
-Overview
+Overview:
 
 Millions of people in crisis depend on how the UN allocates limited humanitarian funding. Our solution combines country-level need-vs-resource analysis with project-level cost-per-beneficiary benchmarking into a single decision-support system.
 
